@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI PM Toolkit Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Instrument+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0e0e11;
+  --ink2: #1a1a1f;
+  --ink3: #252530;
+  --surface: #f5f4ef;
+  --surface2: #eceae2;
+  --surface3: #e0ddd3;
+  --text: #0e0e11;
+  --muted: #6b6860;
+  --muted2: #9b9890;
+  --lime: #c8f135;
+  --lime-dark: #8fb800;
+  --blue: #2563eb;
+  --blue-soft: #dbeafe;
+  --orange: #ea580c;
+  --orange-soft: #ffedd5;
+  --teal: #0d9488;
+  --teal-soft: #ccfbf1;
+  --violet: #7c3aed;
+  --violet-soft: #ede9fe;
+  --rose: #e11d48;
+  --rose-soft: #ffe4e6;
+  --amber: #d97706;
+  --amber-soft: #fef3c7;
+  --font-head: 'Bricolage Grotesque', sans-serif;
+  --font-body: 'Instrument Sans', sans-serif;
+  --radius: 14px;
+  --radius-sm: 8px;
+  --shadow: 0 2px 8px rgba(0,0,0,0.07), 0 0 1px rgba(0,0,0,0.08);
+  --shadow-md: 0 8px 24px rgba(0,0,0,0.1), 0 0 1px rgba(0,0,0,0.06);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── SIDEBAR ── */
+.layout { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: 260px; flex-shrink: 0;
+  background: var(--ink);
+  display: flex; flex-direction: column;
+  position: sticky; top: 0; height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar-brand {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.brand-logo {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 4px;
+}
+.brand-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--lime);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+.brand-name {
+  font-family: var(--font-head); font-size: 16px; font-weight: 800;
+  color: #fff; letter-spacing: -0.4px;
+}
+.brand-sub { font-size: 11px; color: rgba(255,255,255,0.35); letter-spacing: 0.3px; }
+
+.sidebar-section { padding: 16px 12px 8px; }
+.sidebar-section-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 1.8px;
+  color: rgba(255,255,255,0.25); text-transform: uppercase;
+  padding: 0 8px; margin-bottom: 6px;
+}
+
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: 8px; margin-bottom: 2px;
+  cursor: pointer; border: none; background: none; width: 100%;
+  text-align: left; color: rgba(255,255,255,0.55);
+  font-family: var(--font-body); font-size: 13px; font-weight: 400;
+  transition: all 0.15s;
+}
+.nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
+.nav-item.active { background: rgba(200,241,53,0.12); color: var(--lime); font-weight: 500; }
+.nav-item.active .nav-dot { background: var(--lime); }
+.nav-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.2); flex-shrink: 0; transition: background 0.15s;
+}
+.nav-icon { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
+.nav-label { flex: 1; }
+.nav-badge {
+  font-size: 10px; padding: 2px 6px; border-radius: 20px;
+  background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.3);
+}
+
+.sidebar-footer {
+  margin-top: auto; padding: 16px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+.powered-by {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.04); border-radius: 8px; padding: 10px 12px;
+}
+.powered-text { font-size: 11px; color: rgba(255,255,255,0.3); line-height: 1.4; }
+.powered-text strong { color: rgba(255,255,255,0.6); display: block; }
+
+/* ── MAIN ── */
+.main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+/* ── TOPBAR ── */
+.topbar {
+  background: var(--surface); border-bottom: 1px solid var(--surface3);
+  padding: 0 32px; height: 60px;
+  display: flex; align-items: center; gap: 16px;
+  position: sticky; top: 0; z-index: 50;
+}
+.topbar-title {
+  font-family: var(--font-head); font-size: 18px; font-weight: 700;
+  letter-spacing: -0.4px; flex: 1;
+}
+.topbar-pill {
+  font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: 500;
+}
+
+/* ── CONTENT ── */
+.content { flex: 1; padding: 32px; max-width: 900px; width: 100%; }
+
+.panel { display: none; animation: fadeIn 0.2s ease; }
+.panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── TOOL CARD ── */
+.tool-card {
+  background: #fff; border-radius: var(--radius); border: 1px solid var(--surface3);
+  box-shadow: var(--shadow); overflow: hidden; margin-bottom: 20px;
+}
+.tool-card-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--surface2);
+  display: flex; align-items: flex-start; gap: 14px;
+}
+.tool-card-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.tool-card-meta { flex: 1; }
+.tool-card-name { font-family: var(--font-head); font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
+.tool-card-desc { font-size: 13px; color: var(--muted); margin-top: 2px; line-height: 1.5; }
+.tool-card-body { padding: 24px; }
+
+/* ── FORM ELEMENTS ── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-grid.cols-1 { grid-template-columns: 1fr; }
+@media(max-width:640px) { .form-grid, .form-grid.cols-3 { grid-template-columns: 1fr; } }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; }
+.field input, .field textarea, .field select {
+  padding: 10px 14px; border-radius: var(--radius-sm); font-size: 14px;
+  border: 1.5px solid var(--surface3); background: var(--surface);
+  color: var(--text); font-family: var(--font-body);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+}
+.field input:focus, .field textarea:focus, .field select:focus {
+  border-color: var(--ink3); box-shadow: 0 0 0 3px rgba(14,14,17,0.06);
+}
+.field textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+.field select { cursor: pointer; }
+
+.tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.tag-chip {
+  padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;
+  border: 1.5px solid var(--surface3); background: var(--surface2);
+  color: var(--muted); cursor: pointer; font-family: var(--font-body);
+  transition: all 0.15s;
+}
+.tag-chip.selected { border-color: var(--ink); background: var(--ink); color: #fff; }
+.tag-chip:hover:not(.selected) { border-color: var(--ink3); color: var(--text); }
+
+/* ── BUTTONS ── */
+.btn-generate {
+  display: flex; align-items: center; gap: 8px; justify-content: center;
+  padding: 12px 28px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600;
+  background: var(--ink); color: var(--lime); border: none; cursor: pointer;
+  font-family: var(--font-body); transition: all 0.15s; width: 100%;
+}
+.btn-generate:hover { background: var(--ink3); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.btn-generate:active { transform: translateY(0); }
+.btn-generate:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.btn-generate .spinner {
+  width: 16px; height: 16px; border: 2px solid rgba(200,241,53,0.3);
+  border-top-color: var(--lime); border-radius: 50%;
+  animation: spin 0.7s linear infinite; display: none;
+}
+.btn-generate.loading .spinner { display: block; }
+.btn-generate.loading .btn-label { opacity: 0.7; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.btn-copy {
+  padding: 7px 14px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 500;
+  background: var(--surface2); color: var(--muted); border: 1px solid var(--surface3);
+  cursor: pointer; font-family: var(--font-body); transition: all 0.15s;
+}
+.btn-copy:hover { background: var(--surface3); color: var(--text); }
+
+/* ── OUTPUT ── */
+.output-box {
+  margin-top: 20px; background: var(--surface);
+  border: 1.5px solid var(--surface3); border-radius: var(--radius-sm);
+  overflow: hidden; display: none;
+}
+.output-box.visible { display: block; }
+.output-header {
+  padding: 10px 16px; background: var(--surface2);
+  border-bottom: 1px solid var(--surface3);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.output-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+.output-content {
+  padding: 20px; font-size: 14px; line-height: 1.8; color: var(--text);
+  white-space: pre-wrap; font-family: var(--font-body);
+  max-height: 520px; overflow-y: auto;
+}
+.output-content.streaming::after {
+  content: '▋'; animation: blink 0.7s step-end infinite; color: var(--muted2);
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ── RICE TABLE ── */
+.rice-inputs { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+.rice-row {
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  gap: 8px; align-items: center;
+}
+.rice-row.header { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; padding: 0 4px; }
+.rice-row input, .rice-row select {
+  padding: 8px 10px; border-radius: 6px; font-size: 13px;
+  border: 1.5px solid var(--surface3); background: var(--surface);
+  color: var(--text); font-family: var(--font-body); outline: none;
+}
+.rice-row input:focus, .rice-row select:focus { border-color: var(--ink3); }
+.rice-score {
+  text-align: center; font-family: var(--font-head); font-size: 15px; font-weight: 700;
+  color: var(--muted2);
+}
+.add-feature-btn {
+  padding: 8px 16px; border-radius: 6px; font-size: 13px;
+  background: none; border: 1.5px dashed var(--surface3); color: var(--muted);
+  cursor: pointer; font-family: var(--font-body); transition: all 0.15s;
+  margin-bottom: 16px;
+}
+.add-feature-btn:hover { border-color: var(--ink3); color: var(--text); background: var(--surface2); }
+
+/* ── SPRINT BOARD ── */
+.sprint-meta { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+
+/* ── OKR BUILDER ── */
+.okr-block {
+  background: var(--surface); border: 1.5px solid var(--surface3);
+  border-radius: 10px; padding: 16px; margin-bottom: 12px;
+}
+.okr-block-label {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px; margin-bottom: 10px;
+}
+.kr-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+.kr-num {
+  width: 22px; height: 22px; border-radius: 50%; background: var(--ink);
+  color: var(--lime); font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  font-family: var(--font-head);
+}
+
+/* ── STAKEHOLDER ── */
+.audience-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.audience-chip {
+  padding: 6px 14px; border-radius: 20px; font-size: 13px;
+  border: 1.5px solid var(--surface3); cursor: pointer;
+  font-family: var(--font-body); transition: all 0.15s;
+  background: var(--surface2); color: var(--muted);
+}
+.audience-chip.sel { background: var(--ink); color: var(--lime); border-color: var(--ink); }
+
+/* ── SECTION DIVIDER ── */
+.section-divider { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.section-divider span { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); white-space: nowrap; }
+.section-divider::before, .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--surface3); }
+
+/* ── HOME ── */
+.home-hero {
+  background: var(--ink); border-radius: var(--radius); padding: 40px;
+  margin-bottom: 24px; position: relative; overflow: hidden;
+}
+.home-hero::before {
+  content: ''; position: absolute; right: -40px; top: -40px;
+  width: 280px; height: 280px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(200,241,53,0.15) 0%, transparent 70%);
+}
+.home-hero-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 2px; color: var(--lime); text-transform: uppercase; margin-bottom: 12px; }
+.home-hero-title { font-family: var(--font-head); font-size: 36px; font-weight: 800; color: #fff; line-height: 1.1; letter-spacing: -1px; margin-bottom: 12px; }
+.home-hero-title span { color: var(--lime); }
+.home-hero-sub { font-size: 15px; color: rgba(255,255,255,0.5); line-height: 1.6; max-width: 420px; }
+.home-tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.home-tool-card {
+  background: #fff; border: 1px solid var(--surface3); border-radius: var(--radius);
+  padding: 18px 20px; cursor: pointer; transition: all 0.18s;
+  display: flex; align-items: flex-start; gap: 14px; box-shadow: var(--shadow);
+}
+.home-tool-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--surface3); }
+.home-tool-card:active { transform: translateY(0); }
+.htc-icon { width: 38px; height: 38px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+.htc-name { font-family: var(--font-head); font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+.htc-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.htc-arrow { margin-left: auto; font-size: 18px; color: var(--muted2); align-self: center; }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 999;
+  background: var(--ink); color: var(--lime); font-size: 13px; font-weight: 600;
+  padding: 10px 18px; border-radius: 8px; opacity: 0; transform: translateY(8px);
+  transition: all 0.22s; pointer-events: none; font-family: var(--font-body);
+  box-shadow: var(--shadow-md);
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* ── COLOR ACCENTS ── */
+.acc-blue   { background: var(--blue-soft);   color: var(--blue); }
+.acc-orange { background: var(--orange-soft);  color: var(--orange); }
+.acc-teal   { background: var(--teal-soft);    color: var(--teal); }
+.acc-violet { background: var(--violet-soft);  color: var(--violet); }
+.acc-rose   { background: var(--rose-soft);    color: var(--rose); }
+.acc-amber  { background: var(--amber-soft);   color: var(--amber); }
+
+.pill-blue   { background: var(--blue-soft);   color: var(--blue);   padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
+.pill-orange { background: var(--orange-soft); color: var(--orange); padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
+.pill-teal   { background: var(--teal-soft);   color: var(--teal);   padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
+.pill-violet { background: var(--violet-soft); color: var(--violet); padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
+.pill-rose   { background: var(--rose-soft);   color: var(--rose);   padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
+.pill-amber  { background: var(--amber-soft);  color: var(--amber);  padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-logo">
+      <div class="brand-icon">⬡</div>
+      <div>
+        <div class="brand-name">PM Toolkit</div>
+      </div>
+    </div>
+    <div class="brand-sub">Powered by Claude AI</div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Workspace</div>
+    <button class="nav-item active" onclick="showPanel('home',this)">
+      <span class="nav-icon">🏠</span><span class="nav-label">Overview</span>
+    </button>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Tools</div>
+    <button class="nav-item" onclick="showPanel('userstory',this)">
+      <span class="nav-icon">📝</span><span class="nav-label">User Stories</span>
+      <span class="nav-badge">AC</span>
+    </button>
+    <button class="nav-item" onclick="showPanel('prd',this)">
+      <span class="nav-icon">📄</span><span class="nav-label">PRD Writer</span>
+    </button>
+    <button class="nav-item" onclick="showPanel('rice',this)">
+      <span class="nav-icon">📊</span><span class="nav-label">RICE Prioritization</span>
+    </button>
+    <button class="nav-item" onclick="showPanel('sprint',this)">
+      <span class="nav-icon">🏃</span><span class="nav-label">Sprint Planner</span>
+    </button>
+    <button class="nav-item" onclick="showPanel('okr',this)">
+      <span class="nav-icon">🎯</span><span class="nav-label">OKR Generator</span>
+    </button>
+    <button class="nav-item" onclick="showPanel('stakeholder',this)">
+      <span class="nav-icon">📣</span><span class="nav-label">Stakeholder Update</span>
+    </button>
+    <button class="nav-item" onclick="showPanel('competitive',this)">
+      <span class="nav-icon">🔍</span><span class="nav-label">Competitive Analysis</span>
+    </button>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="powered-by">
+      <div style="font-size:20px">🤖</div>
+      <div class="powered-text"><strong>Claude Sonnet</strong>All tools run on Claude AI via Anthropic API</div>
+    </div>
+  </div>
+</aside>
+
+<!-- ── MAIN ── -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">Overview</div>
+    <span class="topbar-pill pill-teal" id="topbar-pill">6 AI Tools</span>
+  </div>
+
+  <div class="content">
+
+    <!-- ══════════ HOME ══════════ -->
+    <div id="panel-home" class="panel active">
+      <div class="home-hero">
+        <div class="home-hero-eyebrow">AI-Powered Workflow</div>
+        <div class="home-hero-title">Your PM work,<br><span>done faster.</span></div>
+        <div class="home-hero-sub">7 Claude-powered tools covering every PM workflow — from user stories to competitive intelligence.</div>
+      </div>
+      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:12px;">Select a tool to get started</div>
+      <div class="home-tools-grid">
+        <div class="home-tool-card" onclick="showPanelByName('userstory')">
+          <div class="htc-icon acc-blue">📝</div>
+          <div><div class="htc-name">User Stories</div><div class="htc-desc">Generate crisp Agile stories with full acceptance criteria</div></div>
+          <div class="htc-arrow">›</div>
+        </div>
+        <div class="home-tool-card" onclick="showPanelByName('prd')">
+          <div class="htc-icon acc-orange">📄</div>
+          <div><div class="htc-name">PRD Writer</div><div class="htc-desc">Draft full product requirements docs from scratch</div></div>
+          <div class="htc-arrow">›</div>
+        </div>
+        <div class="home-tool-card" onclick="showPanelByName('rice')">
+          <div class="htc-icon acc-teal">📊</div>
+          <div><div class="htc-name">RICE Prioritization</div><div class="htc-desc">Score and rank your backlog features instantly</div></div>
+          <div class="htc-arrow">›</div>
+        </div>
+        <div class="home-tool-card" onclick="showPanelByName('sprint')">
+          <div class="htc-icon acc-violet">🏃</div>
+          <div><div class="htc-name">Sprint Planner</div><div class="htc-desc">Plan sprints and run effective retrospectives</div></div>
+          <div class="htc-arrow">›</div>
+        </div>
+        <div class="home-tool-card" onclick="showPanelByName('okr')">
+          <div class="htc-icon acc-rose">🎯</div>
+          <div><div class="htc-name">OKR Generator</div><div class="htc-desc">Generate business-aligned objectives and key results</div></div>
+          <div class="htc-arrow">›</div>
+        </div>
+        <div class="home-tool-card" onclick="showPanelByName('stakeholder')">
+          <div class="htc-icon acc-amber">📣</div>
+          <div><div class="htc-name">Stakeholder Update</div><div class="htc-desc">Write clear, tailored stakeholder communications</div></div>
+          <div class="htc-arrow">›</div>
+        </div>
+        <div class="home-tool-card" onclick="showPanelByName('competitive')">
+          <div class="htc-icon acc-blue">🔍</div>
+          <div><div class="htc-name">Competitive Analysis</div><div class="htc-desc">Analyze competitors and surface strategic insights</div></div>
+          <div class="htc-arrow">›</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ USER STORIES ══════════ -->
+    <div id="panel-userstory" class="panel">
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-card-icon acc-blue">📝</div>
+          <div class="tool-card-meta">
+            <div class="tool-card-name">User Story Generator</div>
+            <div class="tool-card-desc">Write crisp Agile user stories with detailed acceptance criteria, edge cases, and definition of done.</div>
+          </div>
+          <span class="pill-blue">AC Included</span>
+        </div>
+        <div class="tool-card-body">
+          <div class="form-grid">
+            <div class="field"><label>User Persona</label><input id="us-persona" placeholder="e.g. B2B Sales Manager, 35, using CRM daily"></div>
+            <div class="field"><label>Feature Name</label><input id="us-feature" placeholder="e.g. One-click meeting scheduler"></div>
+          </div>
+          <div class="form-grid cols-1">
+            <div class="field"><label>Feature Description</label><textarea id="us-desc" rows="3" placeholder="Describe what the feature does and how the user interacts with it..."></textarea></div>
+          </div>
+          <div class="form-grid">
+            <div class="field"><label>User Goal / Benefit</label><input id="us-goal" placeholder="e.g. Schedule meetings without leaving the CRM"></div>
+            <div class="field"><label>Story Format</label>
+              <select id="us-format">
+                <option value="standard">As a [user], I want... so that...</option>
+                <option value="job">Job Story: When... I want to... So I can...</option>
+                <option value="bdd">BDD: Given/When/Then</option>
+              </select>
+            </div>
+          </div>
+          <div class="section-divider"><span>Story Type</span></div>
+          <div class="tag-row" id="us-types">
+            <span class="tag-chip selected" onclick="toggleTag(this)">Feature</span>
+            <span class="tag-chip" onclick="toggleTag(this)">Enhancement</span>
+            <span class="tag-chip" onclick="toggleTag(this)">Bug Fix</span>
+            <span class="tag-chip" onclick="toggleTag(this)">Technical Debt</span>
+            <span class="tag-chip" onclick="toggleTag(this)">Integration</span>
+          </div>
+          <button class="btn-generate" id="btn-us" onclick="generateTool('userstory')">
+            <div class="spinner"></div><span class="btn-label">✦ Generate User Story + Acceptance Criteria</span>
+          </button>
+          <div class="output-box" id="out-userstory">
+            <div class="output-header">
+              <span class="output-label">Generated Output</span>
+              <button class="btn-copy" onclick="copyOutput('out-userstory')">Copy ↗</button>
+            </div>
+            <div class="output-content" id="out-userstory-content"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PRD ══════════ -->
+    <div id="panel-prd" class="panel">
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-card-icon acc-orange">📄</div>
+          <div class="tool-card-meta">
+            <div class="tool-card-name">PRD Writer</div>
+            <div class="tool-card-desc">Draft full Product Requirements Documents with problem statement, goals, user personas, requirements, and success metrics.</div>
+          </div>
+          <span class="pill-orange">Full PRD</span>
+        </div>
+        <div class="tool-card-body">
+          <div class="form-grid">
+            <div class="field"><label>Product / Feature Name</label><input id="prd-name" placeholder="e.g. AI-powered email composer"></div>
+            <div class="field"><label>Product Stage</label>
+              <select id="prd-stage">
+                <option>New feature</option>
+                <option>MVP</option>
+                <option>Iteration / v2</option>
+                <option>Platform / 0→1</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid cols-1">
+            <div class="field"><label>Problem Statement</label><textarea id="prd-problem" rows="2" placeholder="What user or business problem does this solve?"></textarea></div>
+          </div>
+          <div class="form-grid">
+            <div class="field"><label>Target Users</label><input id="prd-users" placeholder="e.g. SMB sales teams, 10–200 employees"></div>
+            <div class="field"><label>Business Goal</label><input id="prd-bizgoal" placeholder="e.g. Increase trial → paid conversion by 20%"></div>
+          </div>
+          <div class="form-grid cols-1">
+            <div class="field"><label>Key Constraints / Context</label><textarea id="prd-constraints" rows="2" placeholder="Tech constraints, timeline, team size, regulatory, budget..."></textarea></div>
+          </div>
+          <div class="section-divider"><span>Sections to include</span></div>
+          <div class="tag-row" id="prd-sections">
+            <span class="tag-chip selected" onclick="toggleTag(this)">Executive Summary</span>
+            <span class="tag-chip selected" onclick="toggleTag(this)">User Personas</span>
+            <span class="tag-chip selected" onclick="toggleTag(this)">Requirements</span>
+            <span class="tag-chip selected" onclick="toggleTag(this)">Success Metrics</span>
+            <span class="tag-chip" onclick="toggleTag(this)">Out of Scope</span>
+            <span class="tag-chip" onclick="toggleTag(this)">Technical Notes</span>
+            <span class="tag-chip" onclick="toggleTag(this)">Risks</span>
+          </div>
+          <button class="btn-generate" id="btn-prd" onclick="generateTool('prd')">
+            <div class="spinner"></div><span class="btn-label">✦ Generate Full PRD</span>
+          </button>
+          <div class="output-box" id="out-prd">
+            <div class="output-header">
+              <span class="output-label">Generated PRD</span>
+              <button class="btn-copy" onclick="copyOutput('out-prd')">Copy ↗</button>
+            </div>
+            <div class="output-content" id="out-prd-content"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ RICE ══════════ -->
+    <div id="panel-rice" class="panel">
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-card-icon acc-teal">📊</div>
+          <div class="tool-card-meta">
+            <div class="tool-card-name">RICE Prioritization</div>
+            <div class="tool-card-desc">Score features using Reach × Impact × Confidence ÷ Effort. Add features, set scores, and get AI-powered prioritization rationale.</div>
+          </div>
+          <span class="pill-teal">Auto-scored</span>
+        </div>
+        <div class="tool-card-body">
+          <div class="field" style="margin-bottom:16px"><label>Product Context</label><input id="rice-context" placeholder="e.g. B2B SaaS project management tool, Q3 growth focus"></div>
+          <div class="section-divider"><span>Feature Backlog</span></div>
+          <div class="rice-row header">
+            <span>Feature</span><span>Reach</span><span>Impact</span><span>Conf %</span><span>Effort</span>
+          </div>
+          <div id="rice-features">
+            <div class="rice-row">
+              <input placeholder="Feature name" value="AI assistant">
+              <input type="number" placeholder="500" value="500" min="0">
+              <select><option value="3">3 — Massive</option><option value="2" selected>2 — High</option><option value="1">1 — Medium</option><option value="0.5">0.5 — Low</option></select>
+              <input type="number" placeholder="80" value="80" min="0" max="100">
+              <input type="number" placeholder="4" value="4" min="0.5" step="0.5">
+            </div>
+            <div class="rice-row">
+              <input placeholder="Feature name" value="Slack integration">
+              <input type="number" placeholder="300" value="300" min="0">
+              <select><option value="3">3 — Massive</option><option value="2">2 — High</option><option value="1" selected>1 — Medium</option><option value="0.5">0.5 — Low</option></select>
+              <input type="number" placeholder="90" value="90" min="0" max="100">
+              <input type="number" placeholder="2" value="2" min="0.5" step="0.5">
+            </div>
+            <div class="rice-row">
+              <input placeholder="Feature name" value="Mobile app">
+              <input type="number" placeholder="800" value="800" min="0">
+              <select><option value="3">3 — Massive</option><option value="2">2 — High</option><option value="1">1 — Medium</option><option value="0.5" selected>0.5 — Low</option></select>
+              <input type="number" placeholder="60" value="60" min="0" max="100">
+              <input type="number" placeholder="8" value="8" min="0.5" step="0.5">
+            </div>
+          </div>
+          <button class="add-feature-btn" onclick="addRiceRow()">+ Add feature</button>
+          <button class="btn-generate" id="btn-rice" onclick="generateTool('rice')">
+            <div class="spinner"></div><span class="btn-label">✦ Score & Prioritize with AI Rationale</span>
+          </button>
+          <div class="output-box" id="out-rice">
+            <div class="output-header">
+              <span class="output-label">Prioritization Report</span>
+              <button class="btn-copy" onclick="copyOutput('out-rice')">Copy ↗</button>
+            </div>
+            <div class="output-content" id="out-rice-content"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ SPRINT ══════════ -->
+    <div id="panel-sprint" class="panel">
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-card-icon acc-violet">🏃</div>
+          <div class="tool-card-meta">
+            <div class="tool-card-name">Sprint Planner & Retro Facilitator</div>
+            <div class="tool-card-desc">Plan focused sprints with capacity allocation, or facilitate structured retrospectives with actionable insights.</div>
+          </div>
+        </div>
+        <div class="tool-card-body">
+          <div class="section-divider"><span>Mode</span></div>
+          <div class="tag-row">
+            <span class="tag-chip selected" id="sprint-mode-plan" onclick="setSprintMode('plan')">Sprint Planning</span>
+            <span class="tag-chip" id="sprint-mode-retro" onclick="setSprintMode('retro')">Retrospective</span>
+          </div>
+
+          <div id="sprint-plan-fields">
+            <div class="form-grid cols-3">
+              <div class="field"><label>Sprint Number</label><input id="sp-num" placeholder="e.g. Sprint 14"></div>
+              <div class="field"><label>Duration</label>
+                <select id="sp-duration"><option>1 week</option><option selected>2 weeks</option><option>3 weeks</option></select>
+              </div>
+              <div class="field"><label>Team Capacity (story pts)</label><input id="sp-capacity" type="number" placeholder="e.g. 40" value="40"></div>
+            </div>
+            <div class="form-grid cols-1">
+              <div class="field"><label>Sprint Goal</label><input id="sp-goal" placeholder="e.g. Ship the onboarding redesign and fix top 3 reported bugs"></div>
+            </div>
+            <div class="form-grid cols-1">
+              <div class="field"><label>Backlog Items (paste or list features)</label><textarea id="sp-backlog" rows="4" placeholder="- Redesign onboarding step 1 (8pts)&#10;- Fix login timeout bug (3pts)&#10;- Add CSV export (5pts)&#10;- Performance improvements (5pts)"></textarea></div>
+            </div>
+          </div>
+
+          <div id="sprint-retro-fields" style="display:none">
+            <div class="form-grid">
+              <div class="field"><label>Sprint / Period</label><input id="ret-sprint" placeholder="e.g. Sprint 13, Q2 2025"></div>
+              <div class="field"><label>Team Size</label><input id="ret-team" placeholder="e.g. 5 engineers, 1 PM, 1 designer"></div>
+            </div>
+            <div class="form-grid cols-1">
+              <div class="field"><label>What went well?</label><textarea id="ret-good" rows="2" placeholder="List wins, completed goals, team highlights..."></textarea></div>
+            </div>
+            <div class="form-grid cols-1">
+              <div class="field"><label>What didn't go well?</label><textarea id="ret-bad" rows="2" placeholder="Blockers, missed goals, process friction..."></textarea></div>
+            </div>
+            <div class="form-grid cols-1">
+              <div class="field"><label>Retro Format</label>
+                <select id="ret-format">
+                  <option>Start / Stop / Continue</option>
+                  <option>4Ls (Liked, Learned, Lacked, Longed For)</option>
+                  <option>Mad / Sad / Glad</option>
+                  <option>Action-focused (What + Who + When)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn-generate" id="btn-sprint" onclick="generateTool('sprint')">
+            <div class="spinner"></div><span class="btn-label" id="sprint-btn-label">✦ Generate Sprint Plan</span>
+          </button>
+          <div class="output-box" id="out-sprint">
+            <div class="output-header">
+              <span class="output-label">Output</span>
+              <button class="btn-copy" onclick="copyOutput('out-sprint')">Copy ↗</button>
+            </div>
+            <div class="output-content" id="out-sprint-content"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ OKR ══════════ -->
+    <div id="panel-okr" class="panel">
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-card-icon acc-rose">🎯</div>
+          <div class="tool-card-meta">
+            <div class="tool-card-name">OKR Generator</div>
+            <div class="tool-card-desc">Generate ambitious, measurable OKRs aligned to business goals. Includes objectives, key results with targets, and leading indicators.</div>
+          </div>
+          <span class="pill-rose">Business-aligned</span>
+        </div>
+        <div class="tool-card-body">
+          <div class="form-grid">
+            <div class="field"><label>Company / Team Name</label><input id="okr-company" placeholder="e.g. Acme Inc. — Growth Team"></div>
+            <div class="field"><label>OKR Period</label>
+              <select id="okr-period">
+                <option>Q1 2025</option><option>Q2 2025</option><option selected>Q3 2025</option><option>Q4 2025</option><option>Annual 2025</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid cols-1">
+            <div class="field"><label>Business Strategy / North Star</label><textarea id="okr-strategy" rows="2" placeholder="e.g. Grow ARR from $2M to $5M by expanding into mid-market segment and reducing churn below 5%"></textarea></div>
+          </div>
+          <div class="form-grid">
+            <div class="field"><label>Current Challenges</label><textarea id="okr-challenges" rows="2" placeholder="e.g. High churn in SMB, slow onboarding, low NPS"></textarea></div>
+            <div class="field"><label>Team Focus Area</label>
+              <select id="okr-focus">
+                <option>Product Growth</option>
+                <option>Customer Retention</option>
+                <option>Revenue / Monetization</option>
+                <option>Activation & Onboarding</option>
+                <option>Platform & Infrastructure</option>
+                <option>Market Expansion</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="field"><label>No. of Objectives</label>
+              <select id="okr-count"><option>2</option><option selected>3</option><option>4</option><option>5</option></select>
+            </div>
+            <div class="field"><label>Key Results per Objective</label>
+              <select id="okr-kr"><option>2</option><option selected>3</option><option>4</option></select>
+            </div>
+          </div>
+          <button class="btn-generate" id="btn-okr" onclick="generateTool('okr')">
+            <div class="spinner"></div><span class="btn-label">✦ Generate OKRs</span>
+          </button>
+          <div class="output-box" id="out-okr">
+            <div class="output-header">
+              <span class="output-label">OKR Framework</span>
+              <button class="btn-copy" onclick="copyOutput('out-okr')">Copy ↗</button>
+            </div>
+            <div class="output-content" id="out-okr-content"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ STAKEHOLDER ══════════ -->
+    <div id="panel-stakeholder" class="panel">
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-card-icon acc-amber">📣</div>
+          <div class="tool-card-meta">
+            <div class="tool-card-name">Stakeholder Update</div>
+            <div class="tool-card-desc">Write clear, tailored stakeholder communications — weekly updates, exec summaries, or launch announcements.</div>
+          </div>
+          <span class="pill-amber">Tailored tone</span>
+        </div>
+        <div class="tool-card-body">
+          <div class="section-divider"><span>Audience</span></div>
+          <div class="audience-grid" id="audience-chips">
+            <span class="audience-chip sel" onclick="toggleAudience(this)">Executive / C-Suite</span>
+            <span class="audience-chip" onclick="toggleAudience(this)">Engineering Team</span>
+            <span class="audience-chip" onclick="toggleAudience(this)">Sales & Marketing</span>
+            <span class="audience-chip" onclick="toggleAudience(this)">Board / Investors</span>
+            <span class="audience-chip" onclick="toggleAudience(this)">Customer Success</span>
+            <span class="audience-chip" onclick="toggleAudience(this)">External Customers</span>
+          </div>
+          <div class="form-grid">
+            <div class="field"><label>Update Type</label>
+              <select id="sh-type">
+                <option>Weekly progress update</option>
+                <option>Monthly business review</option>
+                <option>Launch announcement</option>
+                <option>Delay / risk communication</option>
+                <option>Milestone celebration</option>
+                <option>Strategy pivot</option>
+              </select>
+            </div>
+            <div class="field"><label>Project / Product Name</label><input id="sh-project" placeholder="e.g. Mobile App Relaunch"></div>
+          </div>
+          <div class="form-grid cols-1">
+            <div class="field"><label>Key Updates / What happened</label><textarea id="sh-updates" rows="3" placeholder="e.g. Completed user testing (NPS: 72), shipped new onboarding, delayed API integration by 1 week due to vendor issue..."></textarea></div>
+          </div>
+          <div class="form-grid">
+            <div class="field"><label>Metrics / Numbers</label><input id="sh-metrics" placeholder="e.g. 2,400 signups, 68% completion rate, $45K MRR"></div>
+            <div class="field"><label>Next Steps</label><input id="sh-next" placeholder="e.g. Launch beta, hire 2 engineers, close 3 deals"></div>
+          </div>
+          <button class="btn-generate" id="btn-stakeholder" onclick="generateTool('stakeholder')">
+            <div class="spinner"></div><span class="btn-label">✦ Write Stakeholder Update</span>
+          </button>
+          <div class="output-box" id="out-stakeholder">
+            <div class="output-header">
+              <span class="output-label">Stakeholder Communication</span>
+              <button class="btn-copy" onclick="copyOutput('out-stakeholder')">Copy ↗</button>
+            </div>
+            <div class="output-content" id="out-stakeholder-content"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ COMPETITIVE ══════════ -->
+    <div id="panel-competitive" class="panel">
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-card-icon acc-blue">🔍</div>
+          <div class="tool-card-meta">
+            <div class="tool-card-name">Competitive Analysis</div>
+            <div class="tool-card-desc">Analyze your competitive landscape, surface gaps, and generate strategic positioning recommendations.</div>
+          </div>
+          <span class="pill-blue">Strategic insights</span>
+        </div>
+        <div class="tool-card-body">
+          <div class="form-grid">
+            <div class="field"><label>Your Product</label><input id="ca-product" placeholder="e.g. Notion — all-in-one workspace"></div>
+            <div class="field"><label>Your Target Market</label><input id="ca-market" placeholder="e.g. SMB teams, 10–100 employees"></div>
+          </div>
+          <div class="form-grid cols-1">
+            <div class="field"><label>Your Key Differentiators / Strengths</label><textarea id="ca-strengths" rows="2" placeholder="e.g. Best-in-class UX, AI writing features, flexible databases, strong community"></textarea></div>
+          </div>
+          <div class="form-grid cols-1">
+            <div class="field"><label>Competitors to Analyze</label><input id="ca-competitors" placeholder="e.g. Coda, Confluence, ClickUp, Airtable, Monday.com"></div>
+          </div>
+          <div class="form-grid cols-1">
+            <div class="field"><label>Dimensions to Compare</label>
+              <div class="tag-row" style="margin-top:8px" id="ca-dims">
+                <span class="tag-chip selected" onclick="toggleTag(this)">Features</span>
+                <span class="tag-chip selected" onclick="toggleTag(this)">Pricing</span>
+                <span class="tag-chip selected" onclick="toggleTag(this)">UX / Design</span>
+                <span class="tag-chip" onclick="toggleTag(this)">AI Capabilities</span>
+                <span class="tag-chip" onclick="toggleTag(this)">Integrations</span>
+                <span class="tag-chip" onclick="toggleTag(this)">Target Segment</span>
+                <span class="tag-chip" onclick="toggleTag(this)">Go-to-Market</span>
+                <span class="tag-chip" onclick="toggleTag(this)">Customer Reviews</span>
+              </div>
+            </div>
+          </div>
+          <div class="form-grid cols-1">
+            <div class="field"><label>Strategic Question to Answer</label><input id="ca-question" placeholder="e.g. Where is the biggest market gap we can own in the next 12 months?"></div>
+          </div>
+          <button class="btn-generate" id="btn-competitive" onclick="generateTool('competitive')">
+            <div class="spinner"></div><span class="btn-label">✦ Generate Competitive Analysis</span>
+          </button>
+          <div class="output-box" id="out-competitive">
+            <div class="output-header">
+              <span class="output-label">Competitive Intelligence Report</span>
+              <button class="btn-copy" onclick="copyOutput('out-competitive')">Copy ↗</button>
+            </div>
+            <div class="output-content" id="out-competitive-content"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+</div>
+
+<div class="toast" id="toast">Copied to clipboard ✓</div>
+
+<script>
+// ── NAVIGATION
+const PANELS = {
+  home:        { title: 'Overview',              pill: '6 AI Tools',      pillClass: 'pill-teal' },
+  userstory:   { title: 'User Story Generator',  pill: 'AC Included',     pillClass: 'pill-blue' },
+  prd:         { title: 'PRD Writer',            pill: 'Full PRD',        pillClass: 'pill-orange' },
+  rice:        { title: 'RICE Prioritization',   pill: 'Auto-scored',     pillClass: 'pill-teal' },
+  sprint:      { title: 'Sprint Planner',        pill: 'Plan + Retro',    pillClass: 'pill-violet' },
+  okr:         { title: 'OKR Generator',         pill: 'Business-aligned',pillClass: 'pill-rose' },
+  stakeholder: { title: 'Stakeholder Update',    pill: 'Tailored tone',   pillClass: 'pill-amber' },
+  competitive: { title: 'Competitive Analysis',  pill: 'Strategic',       pillClass: 'pill-blue' },
+};
+
+function showPanel(name, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+  const meta = PANELS[name] || {};
+  document.getElementById('topbar-title').textContent = meta.title || name;
+  const pill = document.getElementById('topbar-pill');
+  pill.textContent = meta.pill || '';
+  pill.className = 'topbar-pill ' + (meta.pillClass || '');
+}
+
+function showPanelByName(name) {
+  const navBtns = document.querySelectorAll('.nav-item');
+  navBtns.forEach(btn => { if (btn.textContent.trim().toLowerCase().includes(name.toLowerCase().replace('-',' '))) btn.classList.add('active'); });
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  const meta = PANELS[name] || {};
+  document.getElementById('topbar-title').textContent = meta.title || name;
+  const pill = document.getElementById('topbar-pill');
+  pill.textContent = meta.pill || '';
+  pill.className = 'topbar-pill ' + (meta.pillClass || '');
+  // highlight nav
+  document.querySelectorAll('.nav-item').forEach(btn => {
+    if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'" + name + "'")) btn.classList.add('active');
+  });
+}
+
+// ── TAG CHIPS
+function toggleTag(el) { el.classList.toggle('selected'); }
+function toggleAudience(el) { el.classList.toggle('sel'); }
+
+// ── SPRINT MODE
+let sprintMode = 'plan';
+function setSprintMode(mode) {
+  sprintMode = mode;
+  document.getElementById('sprint-mode-plan').classList.toggle('selected', mode === 'plan');
+  document.getElementById('sprint-mode-retro').classList.toggle('selected', mode === 'retro');
+  document.getElementById('sprint-plan-fields').style.display = mode === 'plan' ? '' : 'none';
+  document.getElementById('sprint-retro-fields').style.display = mode === 'retro' ? '' : 'none';
+  document.getElementById('sprint-btn-label').textContent = mode === 'plan' ? '✦ Generate Sprint Plan' : '✦ Generate Retrospective';
+}
+
+// ── RICE ROWS
+function addRiceRow() {
+  const container = document.getElementById('rice-features');
+  const row = document.createElement('div'); row.className = 'rice-row';
+  row.innerHTML = `<input placeholder="Feature name">
+    <input type="number" placeholder="100" min="0">
+    <select><option value="3">3 — Massive</option><option value="2" selected>2 — High</option><option value="1">1 — Medium</option><option value="0.5">0.5 — Low</option></select>
+    <input type="number" placeholder="70" min="0" max="100">
+    <input type="number" placeholder="3" min="0.5" step="0.5">`;
+  container.appendChild(row);
+}
+
+// ── BUILD PROMPTS
+function buildPrompt(tool) {
+  const getVal = id => (document.getElementById(id)||{}).value || '';
+  const getTags = id => [...(document.querySelectorAll(`#${id} .tag-chip.selected`)||[])].map(t=>t.textContent).join(', ');
+
+  if (tool === 'userstory') {
+    const type = getTags('us-types');
+    const format = getVal('us-format');
+    return `You are an expert Product Manager. Generate a complete, production-ready user story.
+
+Persona: ${getVal('us-persona')}
+Feature: ${getVal('us-feature')}
+Description: ${getVal('us-desc')}
+Goal/Benefit: ${getVal('us-goal')}
+Story Type: ${type}
+Format: ${format}
+
+Produce:
+1. USER STORY — Written in the requested format, clear and specific
+2. ACCEPTANCE CRITERIA — At least 5 specific, testable criteria (Given/When/Then or checkbox format)
+3. EDGE CASES — 3 important edge cases to handle
+4. DEFINITION OF DONE — 4-6 technical/QA criteria
+5. STORY POINTS ESTIMATE — With brief justification (Fibonacci: 1,2,3,5,8,13)
+
+Be specific, avoid vague language. Write as if this goes directly into Jira.`;
+  }
+
+  if (tool === 'prd') {
+    const sections = getTags('prd-sections');
+    return `You are a senior Product Manager writing a professional PRD.
+
+Product/Feature: ${getVal('prd-name')}
+Stage: ${getVal('prd-stage')}
+Problem: ${getVal('prd-problem')}
+Target Users: ${getVal('prd-users')}
+Business Goal: ${getVal('prd-bizgoal')}
+Constraints: ${getVal('prd-constraints')}
+Sections required: ${sections}
+
+Write a complete, structured PRD with all requested sections. Include:
+- Clear problem framing with data/evidence placeholders
+- Specific, measurable success metrics
+- Functional requirements (numbered, detailed)
+- Non-functional requirements
+- Out-of-scope explicitly stated
+Make it detailed enough for an engineering team to start building.`;
+  }
+
+  if (tool === 'rice') {
+    const rows = document.querySelectorAll('#rice-features .rice-row');
+    let features = [];
+    rows.forEach(row => {
+      const inputs = row.querySelectorAll('input');
+      const select = row.querySelector('select');
+      const name = inputs[0]?.value;
+      const reach = parseFloat(inputs[1]?.value)||0;
+      const impact = parseFloat(select?.value)||1;
+      const conf = parseFloat(inputs[2]?.value)||50;
+      const effort = parseFloat(inputs[3]?.value)||1;
+      if (name) {
+        const score = Math.round((reach * impact * (conf/100)) / effort);
+        features.push({ name, reach, impact, conf, effort, score });
+      }
+    });
+    const featureList = features.map(f =>
+      `- ${f.name}: Reach=${f.reach}, Impact=${f.impact}, Confidence=${f.conf}%, Effort=${f.effort} → RICE Score: ${f.score}`
+    ).join('\n');
+    return `You are a product strategy expert. Analyze this RICE-scored feature backlog and provide prioritization guidance.
+
+Product Context: ${getVal('rice-context')}
+
+Features with calculated RICE scores:
+${featureList}
+
+Provide:
+1. PRIORITY RANKING — Ranked list with RICE score for each feature
+2. TOP RECOMMENDATION — Which feature to build first and why (2-3 sentences)
+3. RATIONALE PER FEATURE — 1-2 sentence strategic justification for each
+4. TRADE-OFFS — Key tensions in this backlog (e.g. quick wins vs strategic bets)
+5. WHAT TO DEPRIORITIZE — What to push to next quarter and why
+
+Be direct and opinionated. Give clear, actionable recommendations.`;
+  }
+
+  if (tool === 'sprint') {
+    if (sprintMode === 'plan') {
+      return `You are an experienced Agile coach and Product Manager.
+
+Sprint: ${getVal('sp-num')}
+Duration: ${getVal('sp-duration')}
+Team Capacity: ${getVal('sp-capacity')} story points
+Sprint Goal: ${getVal('sp-goal')}
+Backlog Items:
+${getVal('sp-backlog')}
+
+Generate a complete sprint plan:
+1. SPRINT GOAL (refined, outcome-focused, 1-2 sentences)
+2. RECOMMENDED SPRINT BACKLOG — Which items to include, with story point allocation and total
+3. CAPACITY ANALYSIS — Points used vs. available, buffer recommendation
+4. RISK FLAGS — Any items that might cause scope creep or block the sprint
+5. DAILY STANDUP TEMPLATE — 3 questions tailored to this sprint's goal
+6. DEFINITION OF DONE — 5 criteria for this sprint specifically
+7. SUCCESS CRITERIA — How to know this sprint succeeded`;
+    } else {
+      return `You are an expert Agile coach facilitating a retrospective.
+
+Sprint/Period: ${getVal('ret-sprint')}
+Team: ${getVal('ret-team')}
+What went well: ${getVal('ret-good')}
+What didn't go well: ${getVal('ret-bad')}
+Format: ${getVal('ret-format')}
+
+Facilitate a structured retrospective:
+1. SUMMARY — 2-3 sentence sprint narrative
+2. RETROSPECTIVE (in requested format) — Organized insights under each category
+3. ROOT CAUSE ANALYSIS — For the top 2 pain points, a brief 5-Why analysis
+4. ACTION ITEMS — 4-5 specific, actionable improvements with suggested owner roles and timelines
+5. TEAM RECOGNITION — Highlight what the team should be proud of
+6. CARRY-FORWARD — What to keep doing next sprint`;
+    }
+  }
+
+  if (tool === 'okr') {
+    return `You are a strategy and OKR expert (trained in Measure What Matters by John Doerr).
+
+Company/Team: ${getVal('okr-company')}
+Period: ${getVal('okr-period')}
+Business Strategy: ${getVal('okr-strategy')}
+Current Challenges: ${getVal('okr-challenges')}
+Focus Area: ${getVal('okr-focus')}
+Objectives: ${getVal('okr-count')}
+Key Results per Objective: ${getVal('okr-kr')}
+
+Generate a complete OKR framework:
+For each Objective:
+- O: Inspiring, qualitative objective statement (not a task)
+- KR1, KR2, KR3: Specific, measurable key results with numeric targets
+- LEADING INDICATOR: Early signal to track weekly
+- INITIATIVES: 2-3 concrete projects/actions to achieve it
+
+End with:
+- ALIGNMENT CHECK — How these OKRs ladder to the stated business strategy
+- RISK: One key assumption each objective depends on`;
+  }
+
+  if (tool === 'stakeholder') {
+    const audiences = [...document.querySelectorAll('#audience-chips .audience-chip.sel')].map(c=>c.textContent).join(', ');
+    return `You are an expert PM communications writer.
+
+Audience: ${audiences}
+Update Type: ${getVal('sh-type')}
+Project: ${getVal('sh-project')}
+Updates: ${getVal('sh-updates')}
+Metrics: ${getVal('sh-metrics')}
+Next Steps: ${getVal('sh-next')}
+
+Write a polished stakeholder update tailored to the specified audience. Include:
+1. SUBJECT LINE (for email)
+2. EXECUTIVE SUMMARY — 2-3 sentences, lead with outcomes not activities
+3. PROGRESS THIS PERIOD — Use bullet points, metrics-first language
+4. KEY DECISIONS NEEDED (if any)
+5. RISKS / BLOCKERS — Brief, with mitigation
+6. NEXT PERIOD PLAN — What's coming and expected outcomes
+7. METRICS DASHBOARD — Key numbers formatted clearly
+
+Tone: appropriate for the audience (exec = crisp & strategic, eng = detailed & technical, board = impact & ROI).`;
+  }
+
+  if (tool === 'competitive') {
+    const dims = getTags('ca-dims');
+    return `You are a product strategy and competitive intelligence expert.
+
+Our Product: ${getVal('ca-product')}
+Target Market: ${getVal('ca-market')}
+Our Strengths: ${getVal('ca-strengths')}
+Competitors: ${getVal('ca-competitors')}
+Analysis Dimensions: ${dims}
+Strategic Question: ${getVal('ca-question')}
+
+Produce a comprehensive competitive analysis:
+1. COMPETITIVE LANDSCAPE — Brief overview of the market dynamics
+2. COMPETITOR PROFILES — For each competitor: positioning, key strengths, weaknesses, target customer
+3. COMPARISON MATRIX — Side-by-side comparison on requested dimensions
+4. GAPS & OPPORTUNITIES — Where competitors are weak or underserving the market
+5. OUR DIFFERENTIATION — Where we win and how to sharpen the message
+6. STRATEGIC RECOMMENDATIONS — 3-5 specific, actionable moves based on this analysis
+7. ANSWER TO STRATEGIC QUESTION — Direct, opinionated answer
+
+Be specific and insightful. Avoid generic statements.`;
+  }
+  return '';
+}
+
+// ── API CALL WITH STREAMING
+async function generateTool(tool) {
+  const btn = document.getElementById('btn-' + tool);
+  const outBox = document.getElementById('out-' + tool);
+  const outContent = document.getElementById('out-' + tool + '-content');
+
+  const prompt = buildPrompt(tool);
+  if (!prompt) return;
+
+  btn.classList.add('loading');
+  btn.disabled = true;
+  outBox.classList.add('visible');
+  outContent.textContent = '';
+  outContent.classList.add('streaming');
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1500,
+        stream: true,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6).trim();
+          if (data === '[DONE]') continue;
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
+              outContent.textContent += parsed.delta.text;
+              outContent.scrollTop = outContent.scrollHeight;
+            }
+          } catch {}
+        }
+      }
+    }
+  } catch (err) {
+    outContent.textContent = '⚠ Could not connect to Claude API. Please ensure the API key is configured.\n\nError: ' + err.message;
+  }
+
+  outContent.classList.remove('streaming');
+  btn.classList.remove('loading');
+  btn.disabled = false;
+}
+
+// ── COPY OUTPUT
+function copyOutput(boxId) {
+  const text = document.getElementById(boxId + '-content')?.textContent;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  });
+}
+</script>
+</body>
+</html>
