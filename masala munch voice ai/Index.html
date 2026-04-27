@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Masala Munch — AI Voice Assistant Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0c;--bg2:#111116;--bg3:#18181f;--bg4:#1f1f28;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#f0ede6;--muted:#7a7670;--muted2:#4a4840;
+  --saffron:#f5820a;--saffron2:#ff9f2e;--saffron-bg:rgba(245,130,10,0.1);
+  --green:#1db954;--green-bg:rgba(29,185,84,0.1);
+  --amber:#f5b942;--amber-bg:rgba(245,185,66,0.1);
+  --red:#e53e3e;--red-bg:rgba(229,62,62,0.1);
+  --blue:#4f8ef7;--blue-bg:rgba(79,142,247,0.1);
+  --cream:#f5f0e8;
+  --fh:'Bebas Neue',sans-serif;
+  --fb:'Plus Jakarta Sans',sans-serif;
+  --fm:'JetBrains Mono',monospace;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100vh;overflow-x:hidden}
+
+/* ── TOP NAV ── */
+.topnav{
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  height:54px;display:flex;align-items:center;padding:0 20px;gap:0;
+  position:sticky;top:0;z-index:100;
+  overflow-x:auto;scrollbar-width:none;
+}
+.topnav::-webkit-scrollbar{display:none}
+.brand{
+  display:flex;align-items:center;gap:10px;
+  padding-right:20px;border-right:1px solid var(--border);margin-right:8px;flex-shrink:0;
+}
+.brand-logo{
+  width:32px;height:32px;border-radius:8px;
+  background:linear-gradient(135deg,var(--saffron),#e05d00);
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+}
+.brand-name{font-family:var(--fh);font-size:20px;letter-spacing:1px;color:var(--saffron2)}
+.brand-tag{font-size:10px;color:var(--muted);letter-spacing:0.5px}
+.nav-btn{
+  height:54px;padding:0 16px;border:none;background:none;
+  font-family:var(--fb);font-size:12.5px;font-weight:500;color:var(--muted);
+  cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;
+  transition:all 0.15s;flex-shrink:0;display:flex;align-items:center;gap:6px;
+}
+.nav-btn:hover{color:var(--text)}
+.nav-btn.active{color:var(--saffron2);border-bottom-color:var(--saffron)}
+.nav-badge{
+  font-size:10px;padding:2px 6px;border-radius:10px;
+  background:var(--green-bg);color:var(--green);font-weight:600;
+}
+
+/* ── PANELS ── */
+.panel{display:none;min-height:calc(100vh - 54px)}
+.panel.active{display:block}
+
+/* ══════════════════════════════
+   MENU BOARD SIMULATOR
+══════════════════════════════ */
+#panel-menuboard{
+  display:none;
+  background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(245,130,10,0.06) 0%,transparent 60%),var(--bg);
+}
+#panel-menuboard.active{display:flex;flex-direction:column;align-items:center;padding:28px 20px 40px}
+
+.scenario-picker{
+  display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;justify-content:center;
+}
+.scen-btn{
+  padding:8px 18px;border-radius:20px;font-size:12px;font-weight:600;
+  border:1.5px solid var(--border2);background:var(--bg2);color:var(--muted);
+  cursor:pointer;font-family:var(--fb);transition:all 0.2s;
+}
+.scen-btn:hover{border-color:var(--saffron);color:var(--saffron2)}
+.scen-btn.active{background:var(--saffron);color:#0a0a0c;border-color:var(--saffron)}
+
+/* MENU BOARD SCREEN */
+.menuboard{
+  width:100%;max-width:560px;
+  background:#000;border-radius:16px;overflow:hidden;
+  border:3px solid #1a1a1a;
+  box-shadow:0 0 0 8px #111,0 40px 80px rgba(0,0,0,0.8),0 0 60px rgba(245,130,10,0.08);
+  position:relative;
+}
+.mb-bezel{background:linear-gradient(180deg,#222 0%,#111 100%);height:28px;display:flex;align-items:center;justify-content:center;gap:6px}
+.mb-dot{width:6px;height:6px;border-radius:50%;background:#333}
+.mb-dot.red{background:#e53e3e;box-shadow:0 0 6px #e53e3e}
+
+.mb-screen{
+  background:#0d0d0d;min-height:460px;
+  display:flex;flex-direction:column;
+  position:relative;overflow:hidden;
+  transition:background 0.5s;
+}
+
+/* STATE 1: IDLE */
+.mb-idle{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:30px 20px;gap:20px;
+}
+.idle-logo{font-family:var(--fh);font-size:48px;letter-spacing:3px;color:var(--saffron2);text-align:center}
+.idle-sub{font-size:13px;color:rgba(255,255,255,0.4);text-align:center;line-height:1.6}
+.mic-ring{
+  width:100px;height:100px;border-radius:50%;
+  border:2px solid var(--saffron);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;animation:pulseRing 2s ease-in-out infinite;
+}
+.mic-ring::before{
+  content:'';position:absolute;width:120px;height:120px;
+  border-radius:50%;border:1px solid rgba(245,130,10,0.2);
+  animation:pulseRing 2s ease-in-out infinite 0.3s;
+}
+.mic-ring::after{
+  content:'';position:absolute;width:140px;height:140px;
+  border-radius:50%;border:1px solid rgba(245,130,10,0.1);
+  animation:pulseRing 2s ease-in-out infinite 0.6s;
+}
+.mic-icon{font-size:40px}
+@keyframes pulseRing{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.05);opacity:0.7}}
+
+.waveform{display:flex;align-items:center;gap:3px;height:32px}
+.wave-bar{
+  width:3px;border-radius:2px;background:var(--saffron);
+  animation:wave 1.2s ease-in-out infinite;transform-origin:bottom;
+}
+.wave-bar:nth-child(1){height:8px;animation-delay:0s}
+.wave-bar:nth-child(2){height:16px;animation-delay:0.1s}
+.wave-bar:nth-child(3){height:24px;animation-delay:0.2s}
+.wave-bar:nth-child(4){height:32px;animation-delay:0.3s}
+.wave-bar:nth-child(5){height:20px;animation-delay:0.4s}
+.wave-bar:nth-child(6){height:28px;animation-delay:0.5s}
+.wave-bar:nth-child(7){height:14px;animation-delay:0.6s}
+.wave-bar:nth-child(8){height:22px;animation-delay:0.7s}
+.wave-bar:nth-child(9){height:10px;animation-delay:0.8s}
+@keyframes wave{0%,100%{transform:scaleY(0.5);opacity:0.6}50%{transform:scaleY(1);opacity:1}}
+
+.listen-pill{
+  background:rgba(245,130,10,0.1);border:1px solid rgba(245,130,10,0.3);
+  border-radius:20px;padding:6px 18px;font-size:12px;color:var(--saffron2);font-weight:600;
+  display:flex;align-items:center;gap:6px;
+}
+.listen-dot{width:6px;height:6px;border-radius:50%;background:var(--saffron);animation:blink2 1s step-end infinite}
+@keyframes blink2{0%,100%{opacity:1}50%{opacity:0.2}}
+
+/* STATE 2: HIGH CONFIDENCE ORDER */
+.mb-order{padding:16px;flex:1;display:flex;flex-direction:column;gap:10px}
+.conf-badge{
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(29,185,84,0.08);border:1px solid rgba(29,185,84,0.25);
+  border-radius:8px;padding:7px 12px;
+}
+.conf-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--green)}
+.conf-score{font-family:var(--fm);font-size:15px;font-weight:500;color:var(--green)}
+.conf-bar{height:3px;background:rgba(255,255,255,0.1);border-radius:2px;margin-top:4px;overflow:hidden}
+.conf-fill{height:100%;border-radius:2px;background:var(--green);transition:width 0.5s}
+
+.order-item{
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+  border-radius:8px;padding:10px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  animation:slideIn 0.3s ease;
+}
+@keyframes slideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.item-name{font-size:13px;font-weight:500}
+.item-price{font-family:var(--fm);font-size:13px;color:var(--saffron2)}
+.item-qty{
+  width:22px;height:22px;border-radius:50%;background:var(--saffron);
+  color:#000;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-right:8px;
+}
+.item-left{display:flex;align-items:center}
+
+.upsell-card{
+  background:linear-gradient(135deg,rgba(245,130,10,0.12),rgba(245,130,10,0.05));
+  border:1px solid rgba(245,130,10,0.35);border-radius:10px;padding:12px;
+  animation:slideIn 0.4s ease;
+}
+.upsell-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.upsell-fire{font-size:16px;animation:shake 0.5s ease infinite alternate}
+@keyframes shake{from{transform:rotate(-5deg)}to{transform:rotate(5deg)}}
+.upsell-title{font-size:11px;font-weight:700;color:var(--saffron2);text-transform:uppercase;letter-spacing:1px}
+.demand-badge{
+  margin-left:auto;background:var(--saffron);color:#000;font-size:10px;font-weight:700;
+  padding:2px 8px;border-radius:10px;font-family:var(--fm);
+}
+.upsell-text{font-size:12px;color:rgba(255,255,255,0.7);margin-bottom:10px;line-height:1.5}
+.upsell-actions{display:flex;gap:8px}
+.upsell-yes,.upsell-no{
+  flex:1;padding:7px;border-radius:6px;font-size:12px;font-weight:600;
+  border:none;cursor:pointer;font-family:var(--fb);transition:all 0.15s;
+}
+.upsell-yes{background:var(--saffron);color:#000}
+.upsell-yes:hover{background:var(--saffron2)}
+.upsell-no{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.5)}
+
+.total-bar{
+  background:rgba(255,255,255,0.05);border-radius:8px;padding:10px 12px;
+  display:flex;justify-content:space-between;align-items:center;
+  border-top:1px solid rgba(255,255,255,0.08);
+}
+.total-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.total-val{font-family:var(--fh);font-size:28px;color:var(--saffron2);letter-spacing:1px}
+
+.confirm-btn{
+  width:100%;padding:12px;border-radius:8px;font-size:14px;font-weight:700;
+  background:linear-gradient(135deg,var(--saffron),#e05d00);
+  color:#000;border:none;cursor:pointer;font-family:var(--fb);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:all 0.2s;
+}
+.confirm-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(245,130,10,0.4)}
+
+/* STATE 3: AMBER / CLARIFICATION */
+.mb-clarify{padding:16px;flex:1;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center}
+.clarify-conf{
+  background:rgba(245,185,66,0.08);border:1px solid rgba(245,185,66,0.3);
+  border-radius:8px;padding:7px 12px;width:100%;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.clarify-conf .conf-label{color:var(--amber)}
+.clarify-conf .conf-score{color:var(--amber)}
+.clarify-conf .conf-fill{background:var(--amber)}
+.question-bubble{
+  background:rgba(245,185,66,0.06);border:1px solid rgba(245,185,66,0.2);
+  border-radius:12px;padding:14px;width:100%;text-align:center;
+}
+.question-icon{font-size:24px;margin-bottom:8px}
+.question-text{font-size:14px;color:rgba(255,255,255,0.85);line-height:1.6;margin-bottom:4px}
+.question-sub{font-size:11px;color:var(--muted)}
+.clarify-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.clarify-opt{
+  background:var(--bg3);border:1.5px solid var(--border2);
+  border-radius:8px;padding:12px;text-align:center;cursor:pointer;
+  transition:all 0.2s;
+}
+.clarify-opt:hover{border-color:var(--saffron);background:rgba(245,130,10,0.06)}
+.clarify-opt.chosen{border-color:var(--green);background:rgba(29,185,84,0.08)}
+.opt-name{font-size:12px;font-weight:600;margin-bottom:4px}
+.opt-price{font-family:var(--fm);font-size:13px;color:var(--saffron2)}
+
+/* STATE 4: RED / HANDOFF */
+.mb-handoff{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:20px;gap:16px;
+  background:rgba(229,62,62,0.03);
+}
+.handoff-overlay{
+  width:100%;background:rgba(229,62,62,0.08);border:1px solid rgba(229,62,62,0.3);
+  border-radius:12px;padding:20px;text-align:center;
+}
+.handoff-icon{font-size:40px;margin-bottom:12px;animation:pulse2 1.5s ease-in-out infinite}
+@keyframes pulse2{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.handoff-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(229,62,62,0.15);border:1px solid rgba(229,62,62,0.4);
+  border-radius:20px;padding:6px 16px;margin-bottom:12px;
+}
+.handoff-badge-text{font-size:13px;font-weight:700;color:var(--red)}
+.handoff-conf{
+  background:rgba(229,62,62,0.08);border:1px solid rgba(229,62,62,0.25);
+  border-radius:8px;padding:7px 12px;width:100%;margin-bottom:8px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.handoff-conf .conf-label{color:var(--red)}
+.handoff-conf .conf-score{color:var(--red)}
+.handoff-conf .conf-fill{background:var(--red)}
+.handoff-text{font-size:13px;color:rgba(255,255,255,0.6);line-height:1.6;margin-bottom:8px}
+.handoff-context{
+  background:rgba(255,255,255,0.03);border-radius:8px;padding:10px;
+  text-align:left;width:100%;
+}
+.hc-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px}
+.hc-item{font-size:12px;color:rgba(255,255,255,0.5);padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+.hc-item:last-child{border-bottom:none}
+.kds-alert{
+  width:100%;background:rgba(229,62,62,0.1);border:1.5px solid rgba(229,62,62,0.4);
+  border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;
+  animation:alertPulse 1s ease-in-out infinite;
+}
+@keyframes alertPulse{0%,100%{border-color:rgba(229,62,62,0.4)}50%{border-color:rgba(229,62,62,0.8)}}
+.kds-label{font-size:12px;font-weight:600;color:var(--red)}
+.kds-sub{font-size:11px;color:rgba(229,62,62,0.6)}
+.timer-chip{
+  margin-left:auto;font-family:var(--fm);font-size:14px;font-weight:500;
+  color:var(--red);background:rgba(229,62,62,0.1);
+  padding:4px 10px;border-radius:6px;
+}
+
+/* CONFIRMED STATE */
+.mb-confirmed{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;padding:20px;
+}
+.confirm-check{
+  width:80px;height:80px;border-radius:50%;
+  background:rgba(29,185,84,0.1);border:2px solid var(--green);
+  display:flex;align-items:center;justify-content:center;
+  font-size:36px;animation:checkPop 0.5s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes checkPop{from{transform:scale(0)}to{transform:scale(1)}}
+.confirm-order-num{font-family:var(--fh);font-size:36px;letter-spacing:2px;color:var(--green)}
+.confirm-items{width:100%;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.ci-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+.ci-row:last-child{border-bottom:none;font-weight:700;color:var(--saffron2)}
+.confirm-wait{
+  background:rgba(79,142,247,0.08);border:1px solid rgba(79,142,247,0.25);
+  border-radius:8px;padding:10px 16px;text-align:center;width:100%;
+}
+.wait-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--blue);margin-bottom:4px}
+.wait-time{font-family:var(--fh);font-size:28px;color:var(--blue)}
+.earn-badge{
+  background:rgba(245,185,66,0.08);border:1px solid rgba(245,185,66,0.25);
+  border-radius:8px;padding:8px 14px;font-size:12px;color:var(--amber);text-align:center;width:100%;
+}
+
+/* SCENARIO DESCRIPTION */
+.scen-desc{
+  max-width:560px;width:100%;margin-top:16px;
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;
+}
+.scen-desc-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--saffron);margin-bottom:6px}
+.scen-desc-text{font-size:13px;color:rgba(255,255,255,0.55);line-height:1.7}
+
+/* ══════════════════════════════
+   PHONE ORDER PANEL
+══════════════════════════════ */
+#panel-phone{
+  display:none;padding:28px 20px 40px;
+  background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(79,142,247,0.06) 0%,transparent 60%),var(--bg);
+}
+#panel-phone.active{display:block}
+
+.phone-layout{max-width:900px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:600px){.phone-layout{grid-template-columns:1fr}}
+
+.phone-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.card-head{
+  padding:14px 18px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.card-head-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.card-head-title{font-size:14px;font-weight:700;letter-spacing:-0.2px}
+.card-head-sub{font-size:11px;color:var(--muted)}
+.card-body{padding:16px 18px}
+
+.ivr-flow{display:flex;flex-direction:column;gap:12px}
+.ivr-step{display:flex;gap:12px;align-items:flex-start}
+.ivr-step-num{
+  width:26px;height:26px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;font-family:var(--fm);
+}
+.ivr-step-num.active{background:var(--saffron);color:#000}
+.ivr-step-num.done{background:var(--green);color:#000}
+.ivr-step-num.pending{background:var(--bg3);color:var(--muted);border:1px solid var(--border2)}
+.ivr-step-content{flex:1}
+.ivr-step-label{font-size:12px;font-weight:600;margin-bottom:3px}
+.ivr-step-text{font-size:11px;color:var(--muted);line-height:1.6}
+.ivr-step-connector{width:2px;height:16px;background:var(--border);margin:4px 0 0 12px}
+
+.call-ui{
+  background:var(--bg3);border-radius:10px;padding:14px;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+}
+.caller-info{text-align:center}
+.caller-name{font-size:16px;font-weight:700;margin-bottom:2px}
+.caller-num{font-size:12px;color:var(--muted);font-family:var(--fm)}
+.call-duration{
+  font-family:var(--fm);font-size:24px;font-weight:500;color:var(--green);
+  background:rgba(29,185,84,0.08);border:1px solid rgba(29,185,84,0.2);
+  border-radius:8px;padding:6px 16px;
+}
+.call-status{font-size:11px;color:var(--muted)}
+
+.order-log{max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:6px}
+.log-msg{
+  padding:8px 10px;border-radius:8px;font-size:12px;line-height:1.5;
+}
+.log-msg.ai{background:rgba(245,130,10,0.08);border-left:2px solid var(--saffron);color:rgba(255,255,255,0.8)}
+.log-msg.customer{background:var(--bg3);border-left:2px solid var(--muted2);color:var(--muted)}
+.log-msg .speaker{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+.log-msg.ai .speaker{color:var(--saffron)}
+.log-msg.customer .speaker{color:var(--muted)}
+
+/* ══════════════════════════════
+   DASHBOARD PANEL
+══════════════════════════════ */
+#panel-dashboard{
+  display:none;padding:28px 20px 40px;
+}
+#panel-dashboard.active{display:block}
+
+.dash-grid-top{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px;max-width:1000px;margin-left:auto;margin-right:auto}
+.kpi-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;
+}
+.kpi-card.alert-card{border-color:rgba(229,62,62,0.3);background:rgba(229,62,62,0.04)}
+.kpi-card.good-card{border-color:rgba(29,185,84,0.2);background:rgba(29,185,84,0.03)}
+.kpi-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px}
+.kpi-val{font-family:var(--fh);font-size:32px;letter-spacing:-0.5px;margin-bottom:4px}
+.kpi-val.green{color:var(--green)}
+.kpi-val.amber{color:var(--amber)}
+.kpi-val.red{color:var(--red)}
+.kpi-val.orange{color:var(--saffron2)}
+.kpi-val.blue{color:var(--blue)}
+.kpi-trend{font-size:11px;display:flex;align-items:center;gap:4px}
+.trend-up{color:var(--green)}
+.trend-down{color:var(--red)}
+.trend-neutral{color:var(--muted)}
+
+.dash-grid-main{display:grid;grid-template-columns:2fr 1fr;gap:14px;max-width:1000px;margin:0 auto 14px}
+@media(max-width:680px){.dash-grid-main{grid-template-columns:1fr}}
+
+.dash-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.dash-card-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.dash-card-title{font-size:13px;font-weight:700}
+.dash-card-body{padding:16px 18px}
+
+/* Outlet table */
+.outlet-table{width:100%;border-collapse:collapse;font-size:12px}
+.outlet-table th{color:var(--muted);font-weight:600;text-align:left;padding:6px 8px;font-size:10px;text-transform:uppercase;letter-spacing:0.8px;border-bottom:1px solid var(--border)}
+.outlet-table td{padding:9px 8px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle}
+.outlet-table tr:last-child td{border-bottom:none}
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px}
+.status-dot.green{background:var(--green);box-shadow:0 0 6px var(--green)}
+.status-dot.amber{background:var(--amber)}
+.status-dot.red{background:var(--red);box-shadow:0 0 6px var(--red);animation:blink3 1s step-end infinite}
+@keyframes blink3{0%,100%{opacity:1}50%{opacity:0.3}}
+.prog-bar{height:5px;border-radius:3px;background:rgba(255,255,255,0.08);overflow:hidden;width:80px}
+.prog-fill{height:100%;border-radius:3px}
+
+/* Mini chart */
+.mini-chart{display:flex;align-items:flex-end;gap:4px;height:60px;padding:0 4px}
+.mc-bar{
+  flex:1;border-radius:3px 3px 0 0;background:var(--saffron);
+  opacity:0.4;transition:opacity 0.2s;min-width:8px;
+}
+.mc-bar.highlight{opacity:1}
+.mc-bar:hover{opacity:0.8}
+
+/* INCIDENT LOG */
+.incident-list{display:flex;flex-direction:column;gap:8px}
+.incident{
+  padding:10px 12px;border-radius:8px;border-left:3px solid;
+  display:flex;align-items:flex-start;gap:10px;
+}
+.incident.p0{border-color:var(--red);background:rgba(229,62,62,0.06)}
+.incident.p1{border-color:var(--amber);background:rgba(245,185,66,0.05)}
+.incident.p2{border-color:var(--blue);background:rgba(79,142,247,0.05)}
+.incident.resolved{border-color:var(--green);background:rgba(29,185,84,0.04);opacity:0.6}
+.inc-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;flex-shrink:0;margin-top:1px;font-family:var(--fm)}
+.incident.p0 .inc-badge{background:var(--red-bg);color:var(--red)}
+.incident.p1 .inc-badge{background:var(--amber-bg);color:var(--amber)}
+.incident.p2 .inc-badge{background:var(--blue-bg);color:var(--blue)}
+.incident.resolved .inc-badge{background:var(--green-bg);color:var(--green)}
+.inc-body{flex:1}
+.inc-title{font-size:12px;font-weight:600;margin-bottom:2px}
+.inc-meta{font-size:11px;color:var(--muted)}
+
+/* ══════════════════════════════
+   KDS PANEL
+══════════════════════════════ */
+#panel-kds{display:none;padding:20px;background:var(--bg)}
+#panel-kds.active{display:block}
+.kds-header{font-family:var(--fh);font-size:28px;letter-spacing:2px;color:var(--saffron2);margin-bottom:16px;text-align:center}
+.kds-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;max-width:1000px;margin:0 auto}
+.kds-ticket{
+  background:var(--bg2);border:1px solid var(--border2);border-radius:12px;
+  overflow:hidden;transition:all 0.2s;
+}
+.kds-ticket-head{
+  padding:10px 14px;display:flex;align-items:center;justify-content:space-between;
+}
+.kds-order-num{font-family:var(--fh);font-size:22px;letter-spacing:1px}
+.kds-channel{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;padding:3px 8px;border-radius:10px}
+.kds-channel.drive{background:var(--saffron-bg);color:var(--saffron2)}
+.kds-channel.phone{background:var(--blue-bg);color:var(--blue)}
+.kds-channel.handoff{background:var(--red-bg);color:var(--red)}
+.kds-time{font-family:var(--fm);font-size:12px;color:var(--muted)}
+.kds-items{padding:10px 14px;border-top:1px solid var(--border)}
+.kds-item-row{font-size:12px;padding:4px 0;color:rgba(255,255,255,0.7);display:flex;gap:6px}
+.kds-item-row::before{content:'›';color:var(--saffron)}
+.kds-footer{
+  padding:10px 14px;border-top:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;
+}
+.kds-complete-btn{
+  flex:1;padding:7px;border-radius:6px;font-size:12px;font-weight:600;
+  background:var(--saffron);color:#000;border:none;cursor:pointer;font-family:var(--fb);
+  transition:all 0.15s;
+}
+.kds-complete-btn:hover{background:var(--saffron2)}
+.kds-ai-tag{font-size:10px;color:var(--green);font-weight:600;display:flex;align-items:center;gap:4px}
+
+.kds-ticket.handoff-ticket{border-color:rgba(229,62,62,0.4);animation:alertPulse 2s ease-in-out infinite}
+.kds-ticket.handoff-ticket .kds-ticket-head{background:rgba(229,62,62,0.06)}
+
+/* ══════════════════════════════
+   SHARED
+══════════════════════════════ */
+.section-label{
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;
+  color:var(--muted);margin-bottom:10px;
+}
+.live-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(229,62,62,0.1);border:1px solid rgba(229,62,62,0.3);
+  border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;color:var(--red);
+}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--red);animation:blink3 1s step-end infinite}
+
+.toast{
+  position:fixed;bottom:20px;right:20px;z-index:999;
+  background:var(--bg2);border:1px solid var(--border2);border-radius:10px;
+  padding:12px 18px;font-size:13px;font-weight:500;
+  opacity:0;transform:translateY(8px);transition:all 0.25s;pointer-events:none;
+  box-shadow:0 8px 24px rgba(0,0,0,0.4);max-width:280px;
+}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.green-toast{border-color:rgba(29,185,84,0.4);color:var(--green)}
+.toast.red-toast{border-color:rgba(229,62,62,0.4);color:var(--red)}
+.toast.orange-toast{border-color:rgba(245,130,10,0.4);color:var(--saffron2)}
+
+.page-title{
+  font-family:var(--fh);font-size:28px;letter-spacing:1px;margin-bottom:4px;
+  background:linear-gradient(135deg,var(--saffron2),var(--amber));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.page-sub{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="brand">
+    <div class="brand-logo">🌶</div>
+    <div>
+      <div class="brand-name">Masala Munch</div>
+      <div class="brand-tag">AI Voice Assistant</div>
+    </div>
+  </div>
+  <button class="nav-btn active" onclick="showPanel('menuboard',this)"><span>🖥</span>Menu Board</button>
+  <button class="nav-btn" onclick="showPanel('phone',this)"><span>📞</span>Phone IVR</button>
+  <button class="nav-btn" onclick="showPanel('kds',this)"><span>🍳</span>KDS</button>
+  <button class="nav-btn" onclick="showPanel('dashboard',this)"><span>📊</span>Dashboard</button>
+  <span class="live-badge" style="margin-left:auto;flex-shrink:0"><span class="live-dot"></span>LIVE PROTOTYPE</span>
+</nav>
+
+<!-- ══════════ MENU BOARD ══════════ -->
+<div id="panel-menuboard" class="panel active">
+  <div class="scenario-picker">
+    <button class="scen-btn active" onclick="setScenario('idle',this)">① Idle / Greeting</button>
+    <button class="scen-btn" onclick="setScenario('order',this)">② Active Order (92%)</button>
+    <button class="scen-btn" onclick="setScenario('clarify',this)">③ Clarification (67%)</button>
+    <button class="scen-btn" onclick="setScenario('handoff',this)">④ Staff Handoff (38%)</button>
+  </div>
+
+  <div class="menuboard">
+    <div class="mb-bezel">
+      <div class="mb-dot"></div><div class="mb-dot"></div>
+      <div class="mb-dot red" id="rec-dot"></div>
+    </div>
+    <div class="mb-screen" id="mb-screen">
+      <!-- Injected by JS -->
+    </div>
+  </div>
+
+  <div class="scen-desc" id="scen-desc"></div>
+</div>
+
+<!-- ══════════ PHONE IVR ══════════ -->
+<div id="panel-phone" class="panel">
+  <div class="page-title">Phone Order — IVR Flow</div>
+  <div class="page-sub">AI handles multi-item phone orders with full order read-back and confirmation. Arjun's scenario — group lunch for 5 people.</div>
+  <div class="phone-layout">
+
+    <div class="phone-card">
+      <div class="card-head">
+        <div class="card-head-icon" style="background:var(--blue-bg);color:var(--blue)">📞</div>
+        <div><div class="card-head-title">Incoming Call</div><div class="card-head-sub">IVR Voice Channel Active</div></div>
+      </div>
+      <div class="card-body">
+        <div class="call-ui">
+          <div class="caller-info">
+            <div class="caller-name">Arjun Sharma</div>
+            <div class="caller-num">+91 98200 45678</div>
+          </div>
+          <div class="call-duration" id="call-timer">02:34</div>
+          <div class="call-status">AI Voice Assistant — Active</div>
+          <div class="waveform" style="justify-content:center">
+            <div class="wave-bar" style="background:var(--blue)"></div>
+            <div class="wave-bar" style="background:var(--blue)"></div>
+            <div class="wave-bar" style="background:var(--blue)"></div>
+            <div class="wave-bar" style="background:var(--blue)"></div>
+            <div class="wave-bar" style="background:var(--blue)"></div>
+            <div class="wave-bar" style="background:var(--blue)"></div>
+            <div class="wave-bar" style="background:var(--blue)"></div>
+          </div>
+        </div>
+        <div style="margin-top:14px">
+          <div class="section-label">IVR Flow Steps</div>
+          <div class="ivr-flow">
+            <div class="ivr-step">
+              <div class="ivr-step-num done">✓</div>
+              <div class="ivr-step-content"><div class="ivr-step-label">Branded Greeting</div><div class="ivr-step-text">"Welcome to Masala Munch! I'm your AI assistant. What can I get for you today?"</div></div>
+            </div>
+            <div class="ivr-step-connector"></div>
+            <div class="ivr-step">
+              <div class="ivr-step-num done">✓</div>
+              <div class="ivr-step-content"><div class="ivr-step-label">Multi-Item Order Capture</div><div class="ivr-step-text">5 items captured across 3 turns. Context maintained throughout.</div></div>
+            </div>
+            <div class="ivr-step-connector"></div>
+            <div class="ivr-step">
+              <div class="ivr-step-num active">3</div>
+              <div class="ivr-step-content"><div class="ivr-step-label">Full Order Read-Back</div><div class="ivr-step-text">"Let me confirm your order — 3x Spicy Chicken Burger, 2x Veg Masala Wrap, 5x Large Mango Lassi. Total: ₹1,645. Is that correct?"</div></div>
+            </div>
+            <div class="ivr-step-connector"></div>
+            <div class="ivr-step">
+              <div class="ivr-step-num pending">4</div>
+              <div class="ivr-step-content"><div class="ivr-step-label">Confirmation + Pickup ETA</div><div class="ivr-step-text">Order pushed to POS. Order #312 confirmed. Pickup in ~18 minutes.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone-card">
+      <div class="card-head">
+        <div class="card-head-icon" style="background:var(--saffron-bg);color:var(--saffron2)">💬</div>
+        <div><div class="card-head-title">Conversation Log</div><div class="card-head-sub">Multi-turn dialogue</div></div>
+      </div>
+      <div class="card-body">
+        <div class="order-log">
+          <div class="log-msg ai"><div class="speaker">🤖 AI</div>Welcome to Masala Munch! I'm your AI assistant. What can I get started for you today?</div>
+          <div class="log-msg customer"><div class="speaker">👤 Arjun</div>Hi, I want to order for 5 people. 3 Spicy Chicken Burgers please.</div>
+          <div class="log-msg ai"><div class="speaker">🤖 AI</div>Got it — 3 Spicy Chicken Burgers. Anything else?</div>
+          <div class="log-msg customer"><div class="speaker">👤 Arjun</div>Yes, 2 Veg Masala Wraps. And we want 5 Large Mango Lassis.</div>
+          <div class="log-msg ai"><div class="speaker">🤖 AI</div>Perfect. Our Cheese Fries are really popular today — want to add 5 portions for ₹395? Great with the burgers!</div>
+          <div class="log-msg customer"><div class="speaker">👤 Arjun</div>No thanks, just the items I listed.</div>
+          <div class="log-msg ai"><div class="speaker">🤖 AI</div>No problem! Let me confirm — 3x Spicy Chicken Burger, 2x Veg Masala Wrap, 5x Large Mango Lassi. Total: ₹1,645. Is that correct?</div>
+          <div class="log-msg customer"><div class="speaker">👤 Arjun</div>Yes, that's correct.</div>
+          <div class="log-msg ai" style="border-color:var(--green)"><div class="speaker">🤖 AI</div>Order #312 confirmed! Ready in approximately 18 minutes. Thank you, Arjun — see you soon! 🙏</div>
+        </div>
+
+        <div style="margin-top:14px;background:rgba(29,185,84,0.06);border:1px solid rgba(29,185,84,0.2);border-radius:8px;padding:12px">
+          <div class="section-label" style="color:var(--green)">Order Summary</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.6);line-height:2">
+            3× Spicy Chicken Burger — ₹597<br>
+            2× Veg Masala Wrap — ₹358<br>
+            5× Large Mango Lassi — ₹690<br>
+            <span style="color:var(--saffron2);font-weight:700;font-family:'JetBrains Mono'">Total: ₹1,645</span>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:var(--green)">✓ Pushed to POS · Order #312 · ETA 18 min</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════ KDS ══════════ -->
+<div id="panel-kds" class="panel">
+  <div class="kds-header">KITCHEN DISPLAY SYSTEM</div>
+  <div style="display:flex;justify-content:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+    <span class="live-badge"><span class="live-dot"></span>BANDRA OUTLET · DRIVE-THRU</span>
+    <span style="font-size:12px;color:var(--muted);background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:3px 12px">14:37 IST</span>
+    <span style="font-size:12px;font-weight:600;background:var(--green-bg);color:var(--green);border:1px solid rgba(29,185,84,0.3);border-radius:20px;padding:3px 12px">Handoff Rate: 11%</span>
+  </div>
+  <div class="kds-grid" id="kds-grid">
+    <!-- Populated by JS -->
+  </div>
+</div>
+
+<!-- ══════════ DASHBOARD ══════════ -->
+<div id="panel-dashboard" class="panel">
+  <div style="max-width:1000px;margin:0 auto">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+      <div>
+        <div class="page-title">Operations Dashboard</div>
+        <div class="page-sub" style="margin-bottom:0">Powai Outlet · Monday 27 Apr 2026 · Lunch Peak</div>
+      </div>
+      <span class="live-badge" style="margin-left:auto"><span class="live-dot"></span>LIVE</span>
+    </div>
+
+    <div class="dash-grid-top">
+      <div class="kpi-card good-card">
+        <div class="kpi-label">Order Accuracy</div>
+        <div class="kpi-val green">96.2%</div>
+        <div class="kpi-trend trend-up">↑ 1.2% vs last week</div>
+      </div>
+      <div class="kpi-card good-card">
+        <div class="kpi-label">Avg Handle Time</div>
+        <div class="kpi-val green">2m 18s</div>
+        <div class="kpi-trend trend-up">↓ 27s vs baseline</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Upsell Conversion</div>
+        <div class="kpi-val orange">23.4%</div>
+        <div class="kpi-trend trend-up">↑ 3.4% vs target</div>
+      </div>
+      <div class="kpi-card good-card">
+        <div class="kpi-label">Handoff Rate</div>
+        <div class="kpi-val green">11%</div>
+        <div class="kpi-trend trend-up">↓ 4% vs pilot</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Hallucination Rate</div>
+        <div class="kpi-val green">0.8%</div>
+        <div class="kpi-trend trend-neutral">Target: &lt;5%</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">POS Uptime</div>
+        <div class="kpi-val green">99.8%</div>
+        <div class="kpi-trend trend-neutral">SLA: 99.5%</div>
+      </div>
+    </div>
+
+    <div class="dash-grid-main">
+      <div class="dash-card">
+        <div class="dash-card-head">
+          <div class="dash-card-title">Network Outlet Status</div>
+          <span style="font-size:11px;color:var(--muted)">3 of 20 outlets · Pilot phase</span>
+        </div>
+        <div class="dash-card-body">
+          <table class="outlet-table">
+            <thead><tr><th>Outlet</th><th>Status</th><th>Accuracy</th><th>Handle Time</th><th>Handoffs</th></tr></thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:600">Bandra</td>
+                <td><span class="status-dot green"></span><span style="color:var(--green);font-size:11px">Healthy</span></td>
+                <td><div class="prog-bar"><div class="prog-fill" style="width:96%;background:var(--green)"></div></div><span style="font-size:11px;margin-left:6px">96%</span></td>
+                <td style="font-family:'JetBrains Mono';font-size:11px">2m 14s</td>
+                <td style="font-size:12px;color:var(--green)">9%</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">Powai</td>
+                <td><span class="status-dot green"></span><span style="color:var(--green);font-size:11px">Healthy</span></td>
+                <td><div class="prog-bar"><div class="prog-fill" style="width:97%;background:var(--green)"></div></div><span style="font-size:11px;margin-left:6px">97%</span></td>
+                <td style="font-family:'JetBrains Mono';font-size:11px">2m 22s</td>
+                <td style="font-size:12px;color:var(--green)">11%</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">Andheri</td>
+                <td><span class="status-dot amber"></span><span style="color:var(--amber);font-size:11px">Watch</span></td>
+                <td><div class="prog-bar"><div class="prog-fill" style="width:91%;background:var(--amber)"></div></div><span style="font-size:11px;margin-left:6px">91%</span></td>
+                <td style="font-family:'JetBrains Mono';font-size:11px">2m 51s</td>
+                <td style="font-size:12px;color:var(--amber)">21%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="dash-card">
+        <div class="dash-card-head">
+          <div class="dash-card-title">Orders / Hour</div>
+          <span style="font-size:11px;color:var(--muted)">Today</span>
+        </div>
+        <div class="dash-card-body">
+          <div class="mini-chart">
+            <div class="mc-bar" style="height:30%"></div>
+            <div class="mc-bar" style="height:45%"></div>
+            <div class="mc-bar" style="height:40%"></div>
+            <div class="mc-bar" style="height:60%"></div>
+            <div class="mc-bar highlight" style="height:95%"></div>
+            <div class="mc-bar highlight" style="height:100%"></div>
+            <div class="mc-bar" style="height:80%"></div>
+            <div class="mc-bar" style="height:55%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:6px">
+            <span>9am</span><span>11am</span><span>1pm</span><span>3pm</span>
+          </div>
+          <div style="margin-top:12px;background:var(--bg3);border-radius:8px;padding:10px">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Current (14:00–15:00)</div>
+            <div style="font-family:'JetBrains Mono';font-size:22px;color:var(--saffron2)">87 orders</div>
+            <div style="font-size:11px;color:var(--green);margin-top:2px">↑ 18% vs same time last week</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="max-width:1000px;margin:0 auto">
+      <div class="dash-card">
+        <div class="dash-card-head">
+          <div class="dash-card-title">Incident Log</div>
+          <span style="font-size:11px;color:var(--muted)">Last 24 hours</span>
+        </div>
+        <div class="dash-card-body">
+          <div class="incident-list">
+            <div class="incident p1">
+              <span class="inc-badge">P1</span>
+              <div class="inc-body">
+                <div class="inc-title">Andheri: Handoff rate exceeded 20% threshold for 45 minutes</div>
+                <div class="inc-meta">08:45 IST · ML Ops investigating · Likely cause: festival crowd noise</div>
+              </div>
+            </div>
+            <div class="incident p2">
+              <span class="inc-badge">P2</span>
+              <div class="inc-body">
+                <div class="inc-title">RAG mismatch detected: "Mango Lassi Festival Special" price</div>
+                <div class="inc-meta">11:20 IST · Data Engineering patched RAG · Resolved in 38 min</div>
+              </div>
+            </div>
+            <div class="incident resolved">
+              <span class="inc-badge">RESOLVED</span>
+              <div class="inc-body">
+                <div class="inc-title">Bandra POS latency spike (&gt;1.5s for 3 orders)</div>
+                <div class="inc-meta">Yesterday 22:10 IST · Engineering resolved · RCA complete</div>
+              </div>
+            </div>
+            <div class="incident resolved">
+              <span class="inc-badge">RESOLVED</span>
+              <div class="inc-body">
+                <div class="inc-title">Hallucination flag: AI cited incorrect combo price (₹299 vs ₹279)</div>
+                <div class="inc-meta">Yesterday 17:55 IST · RAG patched immediately · Session flagged for review</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── PANELS
+function showPanel(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+// ── TOAST
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + (type ? type + '-toast' : '');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── MENU BOARD SCENARIOS
+const SCENARIOS = {
+  idle: {
+    desc: 'State 1 — Idle / Greeting: Animated mic waveform. Branded welcome message displayed. "Listening..." status active. Customer not yet detected at intercom.',
+    render: () => `
+      <div class="mb-idle">
+        <div class="idle-logo">MASALA MUNCH</div>
+        <div class="mic-ring"><div class="mic-icon">🎙</div></div>
+        <div style="font-size:22px;font-weight:700;color:rgba(255,255,255,0.9);text-align:center">
+          Hi! I'm your Masala Munch AI —<br>go ahead and order!
+        </div>
+        <div class="waveform" style="justify-content:center">
+          <div class="wave-bar"></div><div class="wave-bar"></div>
+          <div class="wave-bar"></div><div class="wave-bar"></div>
+          <div class="wave-bar"></div><div class="wave-bar"></div>
+          <div class="wave-bar"></div><div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+        </div>
+        <div class="listen-pill"><span class="listen-dot"></span>Listening...</div>
+        <div class="idle-sub">Drive-thru lane detected · AI ready · Confidence engine active</div>
+      </div>
+    `
+  },
+  order: {
+    desc: 'State 2 — Active Order (High Confidence: 92%): Live order summary building in real time. Upsell badge triggered by demand forecast (+38% Cheese Fries). Customer can confirm or add items.',
+    render: () => `
+      <div class="mb-order">
+        <div class="conf-badge">
+          <span class="conf-label">AI Confidence</span>
+          <span class="conf-score">92% ✓</span>
+        </div>
+        <div class="conf-bar"><div class="conf-fill" style="width:92%;background:var(--green)"></div></div>
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px">Your Order</div>
+        <div class="order-item">
+          <div class="item-left">
+            <div class="item-qty">1</div>
+            <div class="item-name">Spicy Chicken Burger</div>
+          </div>
+          <div class="item-price">₹199</div>
+        </div>
+        <div class="order-item">
+          <div class="item-left">
+            <div class="item-qty">1</div>
+            <div class="item-name">Large Coke</div>
+          </div>
+          <div class="item-price">₹79</div>
+        </div>
+        <div class="upsell-card">
+          <div class="upsell-header">
+            <div class="upsell-fire">🔥</div>
+            <div class="upsell-title">Popular Right Now</div>
+            <div class="demand-badge">+38% today</div>
+          </div>
+          <div class="upsell-text">Cheese Fries are flying out today — want to add a portion for ₹79? Pairs perfectly with your burger!</div>
+          <div class="upsell-actions">
+            <button class="upsell-yes" onclick="addUpsell()">Yes, add it! 🧀</button>
+            <button class="upsell-no" onclick="skipUpsell()">No thanks</button>
+          </div>
+        </div>
+        <div class="total-bar">
+          <span class="total-label">Total</span>
+          <span class="total-val" id="order-total">₹278</span>
+        </div>
+        <button class="confirm-btn" onclick="confirmOrder()">✓ Confirm Order — ₹278</button>
+      </div>
+    `
+  },
+  clarify: {
+    desc: 'State 3 — Clarification (Medium Confidence: 67%): Amber highlight on ambiguous item. Customer said "woh wala burger dena" — AI presents two options. Tappable clarification cards shown.',
+    render: () => `
+      <div class="mb-clarify">
+        <div class="clarify-conf" style="width:100%">
+          <span class="conf-label" style="color:var(--amber)">AI Confidence</span>
+          <span class="conf-score" style="color:var(--amber)">67% ⚠</span>
+        </div>
+        <div class="conf-bar" style="width:100%"><div class="conf-fill" style="width:67%;background:var(--amber)"></div></div>
+        <div class="question-bubble" style="width:100%">
+          <div class="question-icon">🤔</div>
+          <div class="question-text">Did you mean one of these?</div>
+          <div class="question-sub">I want to get your order exactly right</div>
+        </div>
+        <div class="clarify-options">
+          <div class="clarify-opt" id="opt-a" onclick="chooseOption('a')">
+            <div class="opt-name">Spicy Chicken Burger</div>
+            <div style="font-size:11px;color:var(--muted);margin:3px 0">Crispy + fiery 🌶</div>
+            <div class="opt-price">₹199</div>
+          </div>
+          <div class="clarify-opt" id="opt-b" onclick="chooseOption('b')">
+            <div class="opt-name">Classic Veg Burger</div>
+            <div style="font-size:11px;color:var(--muted);margin:3px 0">Fan favourite 🌿</div>
+            <div class="opt-price">₹179</div>
+          </div>
+        </div>
+        <div class="waveform" style="justify-content:center;margin-top:4px">
+          <div class="wave-bar" style="background:var(--amber)"></div>
+          <div class="wave-bar" style="background:var(--amber)"></div>
+          <div class="wave-bar" style="background:var(--amber)"></div>
+          <div class="wave-bar" style="background:var(--amber)"></div>
+          <div class="wave-bar" style="background:var(--amber)"></div>
+        </div>
+        <div style="font-size:11px;color:rgba(245,185,66,0.6);text-align:center">Tap your choice or say it aloud</div>
+      </div>
+    `
+  },
+  handoff: {
+    desc: 'State 4 — Staff Handoff (Low Confidence: 38%): Heavy accent + background noise. AI gracefully transfers to staff. Full partial order context passed to KDS. Staff alerted within 3 seconds.',
+    render: () => `
+      <div class="mb-handoff">
+        <div class="handoff-conf" style="width:100%">
+          <span class="conf-label" style="color:var(--red)">AI Confidence</span>
+          <span class="conf-score" style="color:var(--red)">38% ✗</span>
+        </div>
+        <div class="conf-bar" style="width:100%"><div class="conf-fill" style="width:38%;background:var(--red)"></div></div>
+        <div class="handoff-overlay" style="width:100%">
+          <div class="handoff-icon">😊</div>
+          <div class="handoff-badge"><span class="handoff-badge-text">Staff Assisting</span></div>
+          <div class="handoff-text">"I want to make sure I get your order exactly right — let me get a team member to help you right away!"</div>
+          <div class="handoff-context">
+            <div class="hc-label">Context passed to staff</div>
+            <div class="hc-item">Lane: Drive-thru Lane 2</div>
+            <div class="hc-item">Partial order: 1× [item unclear]</div>
+            <div class="hc-item">Confidence at handoff: 38%</div>
+            <div class="hc-item">Retries: 2 of 2 attempted</div>
+          </div>
+        </div>
+        <div class="kds-alert" style="width:100%">
+          <div>
+            <div class="kds-label">🔔 KDS Alert Sent</div>
+            <div class="kds-sub">Team member alerted · Lane 2 · Full context passed</div>
+          </div>
+          <div class="timer-chip" id="handoff-timer">0:08</div>
+        </div>
+      </div>
+    `
+  }
+};
+
+let currentScenario = 'idle';
+function setScenario(name, btn) {
+  currentScenario = name;
+  document.querySelectorAll('.scen-btn').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  document.getElementById('mb-screen').innerHTML = SCENARIOS[name].render();
+  document.getElementById('scen-desc').innerHTML = `<div class="scen-desc-title">PRD Reference</div><div class="scen-desc-text">${SCENARIOS[name].desc}</div>`;
+  document.getElementById('rec-dot').style.background = name === 'idle' ? '#333' : (name === 'handoff' ? '#e53e3e' : '#f5820a');
+}
+
+// Init menu board
+setScenario('idle', document.querySelector('.scen-btn'));
+
+// Upsell actions
+function addUpsell() {
+  document.getElementById('order-total').textContent = '₹357';
+  document.querySelector('.upsell-card').innerHTML = `
+    <div style="text-align:center;padding:6px">
+      <div style="font-size:20px;margin-bottom:6px">🧀✅</div>
+      <div style="font-size:13px;color:var(--green);font-weight:600">Cheese Fries added!</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:3px">Upsell conversion logged · Revenue +₹79</div>
+    </div>`;
+  document.querySelector('.confirm-btn').textContent = '✓ Confirm Order — ₹357';
+  showToast('Upsell accepted! Revenue +₹79', 'green');
+}
+function skipUpsell() {
+  document.querySelector('.upsell-card').remove();
+  showToast('Upsell declined. Offer not repeated per PRD guardrails.', '');
+}
+function confirmOrder() {
+  document.getElementById('mb-screen').innerHTML = `
+    <div class="mb-confirmed">
+      <div class="confirm-check">✓</div>
+      <div class="confirm-order-num">#247</div>
+      <div style="font-size:12px;color:var(--muted)">Order confirmed · Pushed to POS + KDS</div>
+      <div class="confirm-items">
+        <div class="ci-row"><span>1× Spicy Chicken Burger</span><span>₹199</span></div>
+        <div class="ci-row"><span>1× Large Coke</span><span>₹79</span></div>
+        <div class="ci-row"><span><strong>Total</strong></span><span style="color:var(--saffron2)">₹278</span></div>
+      </div>
+      <div class="confirm-wait">
+        <div class="wait-label">Estimated Wait</div>
+        <div class="wait-time">4 min</div>
+      </div>
+      <div class="earn-badge">🌟 You earned 28 loyalty points!</div>
+      <div style="font-size:12px;color:var(--muted);text-align:center">Drive forward please 🙏</div>
+    </div>`;
+  showToast('Order #247 confirmed! POS updated in 1.2s', 'green');
+}
+
+function chooseOption(opt) {
+  const name = opt === 'a' ? 'Spicy Chicken Burger' : 'Classic Veg Burger';
+  const price = opt === 'a' ? '₹199' : '₹179';
+  document.getElementById('opt-' + opt).classList.add('chosen');
+  setTimeout(() => {
+    document.getElementById('mb-screen').innerHTML = SCENARIOS['order'].render();
+    showToast(`${name} selected! Confidence now 94%`, 'green');
+  }, 800);
+}
+
+// ── KDS DATA
+const KDS_ORDERS = [
+  { num: '#244', channel: 'drive', chanLabel: 'Drive-Thru', time: '2m 10s', items: ['1× Spicy Chicken Burger', '1× Large Coke'], ai: true },
+  { num: '#245', channel: 'phone', chanLabel: 'Phone Order', time: '3m 45s', items: ['3× Veg Masala Wrap', '3× Mango Lassi', '1× Paneer Tikka'], ai: true },
+  { num: '#246', channel: 'handoff', chanLabel: 'Staff Handoff', time: '0m 58s', items: ['1× [Partial — staff completing]'], ai: false },
+  { num: '#247', channel: 'drive', chanLabel: 'Drive-Thru', time: '0m 12s', items: ['1× Spicy Chicken Burger', '1× Large Coke', '1× Cheese Fries'], ai: true },
+  { num: '#248', channel: 'phone', chanLabel: 'Phone Order', time: '1m 30s', items: ['2× Classic Veg Burger', '2× Cold Coffee'], ai: true },
+  { num: '#249', channel: 'drive', chanLabel: 'Drive-Thru', time: '0m 05s', items: ['1× Masala Veg Burger', '1× Medium Fries'], ai: true },
+];
+
+function buildKDS() {
+  const grid = document.getElementById('kds-grid');
+  grid.innerHTML = KDS_ORDERS.map(o => `
+    <div class="kds-ticket ${o.channel === 'handoff' ? 'handoff-ticket' : ''}">
+      <div class="kds-ticket-head" style="background:${o.channel === 'drive' ? 'rgba(245,130,10,0.06)' : o.channel === 'phone' ? 'rgba(79,142,247,0.06)' : 'rgba(229,62,62,0.08)'}">
+        <div>
+          <div class="kds-order-num" style="color:${o.channel === 'handoff' ? 'var(--red)' : 'var(--saffron2)'}">${o.num}</div>
+          <div class="kds-time">${o.time} ago</div>
+        </div>
+        <span class="kds-channel ${o.channel}">${o.chanLabel}</span>
+      </div>
+      <div class="kds-items">
+        ${o.items.map(i => `<div class="kds-item-row">${i}</div>`).join('')}
+      </div>
+      <div class="kds-footer">
+        <button class="kds-complete-btn" onclick="completeOrder(this,'${o.num}')">Mark Complete</button>
+        ${o.ai ? '<span class="kds-ai-tag">🤖 AI</span>' : '<span class="kds-ai-tag" style="color:var(--red)">👤 Staff</span>'}
+      </div>
+    </div>
+  `).join('');
+}
+
+function completeOrder(btn, num) {
+  btn.closest('.kds-ticket').style.opacity = '0.3';
+  btn.disabled = true;
+  btn.textContent = '✓ Done';
+  showToast(`Order ${num} completed`, 'green');
+}
+
+buildKDS();
+
+// ── CALL TIMER
+let callSecs = 154;
+function tickTimer() {
+  const el = document.getElementById('call-timer');
+  if (!el) return;
+  callSecs++;
+  const m = String(Math.floor(callSecs/60)).padStart(2,'0');
+  const s = String(callSecs%60).padStart(2,'0');
+  el.textContent = `${m}:${s}`;
+}
+setInterval(tickTimer, 1000);
+
+// ── HANDOFF TIMER countdown
+let handoffSecs = 8;
+setInterval(() => {
+  const el = document.getElementById('handoff-timer');
+  if (!el) return;
+  if (handoffSecs > 0) handoffSecs--;
+  el.textContent = `0:0${handoffSecs}`;
+}, 1000);
+</script>
+</body>
+</html>
